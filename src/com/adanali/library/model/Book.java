@@ -26,7 +26,7 @@ public class Book {
 
     public void setIsbn(String inputIsbn) {
         if (inputIsbn == null || inputIsbn.length() != 13 || !inputIsbn.matches("\\d{13}")) {
-            throw new IllegalArgumentException("ISBN must be a 13-digit number.");
+            System.err.println("Not a valid ISBN number!");
         }
         this.isbn = inputIsbn;
     }
@@ -37,7 +37,7 @@ public class Book {
 
     public void setTitle(String title) {
         if (title == null || title.isEmpty()) {
-            throw new IllegalArgumentException("Title cannot be empty.");
+            System.err.println("Title cannot be empty.");
         }
         this.title = title;
     }
@@ -48,7 +48,7 @@ public class Book {
 
     public void setAuthor(String author) {
         if (author == null || author.isEmpty()) {
-            throw new IllegalArgumentException("Author name cannot be empty.");
+            System.err.println("Author name cannot be empty.");
         }
         this.authorName = author;
     }
@@ -59,7 +59,7 @@ public class Book {
 
     public void setGenre(String genre) {
         if (genre == null || genre.isEmpty()) {
-            throw new IllegalArgumentException("Genre cannot be empty.");
+            System.err.println("Genre cannot be empty.");
         }
         this.genre = genre;
     }
@@ -70,7 +70,7 @@ public class Book {
 
     public void setPublicationDate(LocalDate publicationDate) {
         if (publicationDate == null) {
-            throw new IllegalArgumentException("Publication date cannot be null.");
+            System.err.println("Publication date cannot be null.");
         }
         this.publicationDate = publicationDate;
     }
@@ -81,7 +81,7 @@ public class Book {
 
     public void setQuantity(int quantity) {
         if (quantity < 0) {
-            throw new IllegalArgumentException("Quantity cannot be negative.");
+            System.err.println("Quantity cannot be negative.");
         }
         this.quantity = quantity;
     }
