@@ -27,8 +27,10 @@ public class Book {
     public void setIsbn(String inputIsbn) {
         if (inputIsbn == null || inputIsbn.length() != 13 || !inputIsbn.matches("\\d{13}")) {
             System.err.println("Not a valid ISBN number!");
+        }else {
+            this.isbn = inputIsbn;
         }
-        this.isbn = inputIsbn;
+
     }
 
     public String getTitle() {
@@ -38,8 +40,10 @@ public class Book {
     public void setTitle(String title) {
         if (title == null || title.isEmpty()) {
             System.err.println("Title cannot be empty.");
+        }else{
+            this.title = title;
         }
-        this.title = title;
+
     }
 
     public String getAuthor() {
@@ -49,8 +53,10 @@ public class Book {
     public void setAuthor(String author) {
         if (author == null || author.isEmpty()) {
             System.err.println("Author name cannot be empty.");
+        }else{
+            this.authorName = author;
         }
-        this.authorName = author;
+
     }
 
     public String getGenre() {
@@ -60,8 +66,10 @@ public class Book {
     public void setGenre(String genre) {
         if (genre == null || genre.isEmpty()) {
             System.err.println("Genre cannot be empty.");
+        }else{
+            this.genre = genre;
         }
-        this.genre = genre;
+
     }
 
     public LocalDate getPublicationDate() {
@@ -71,8 +79,10 @@ public class Book {
     public void setPublicationDate(LocalDate publicationDate) {
         if (publicationDate == null) {
             System.err.println("Publication date cannot be null.");
+        }else {
+            this.publicationDate = publicationDate;
         }
-        this.publicationDate = publicationDate;
+
     }
 
     public int getQuantity() {
@@ -82,8 +92,10 @@ public class Book {
     public void setQuantity(int quantity) {
         if (quantity < 0) {
             System.err.println("Quantity cannot be negative.");
+        }else{
+            this.quantity = quantity;
         }
-        this.quantity = quantity;
+
     }
 
     @Override
