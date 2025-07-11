@@ -14,10 +14,10 @@ public class BookService {
     }
 
     public void addBook(Book book){
-        if (book != null){
+        if (book != null && getBookByIsbn(book.getIsbn()) == null){
             books.add(book);
-        }else {
-            System.err.println("Pass a valid Book!");
+        } else {
+            System.err.println("Book already exists or invalid input!");
         }
     }
 
@@ -30,21 +30,16 @@ public class BookService {
         return false;
     }
 
-    public boolean updateBookStatus(String isbn, Book updatedBook){
-        if (updatedBook != null){
-            if (isbn != null && isbn.length() == 13 && isbn.matches("\\d{13}")){
-                for (Book book : books){
-                    if (book.getIsbn().equals(isbn)){
-                        book = updatedBook;
-                        return true;
-                    }
-
+    public boolean updateBook(String isbn, Book updatedBook){
+        if (updatedBook != null && isbn != null && isbn.length() == 13 && isbn.matches("\\d{13}")){
+            for (int i = 0; i < books.size(); i++) {
+                if (books.get(i).getIsbn().equals(isbn)) {
+                    books.set(i, updatedBook);
+                    return true;
                 }
-            }else {
-                System.err.println("Pass a valid Isbn Number!");
             }
         }else {
-            System.err.println("Pass a valid Book!");
+            System.err.println("Pass valid Arguments!");
         }
         return false;
     }
@@ -63,8 +58,8 @@ public class BookService {
     }
 
     public List<Book> searchBook(String query){
+        List<Book> result = new ArrayList<Book>();
         if (query != null && !query.isEmpty()){
-            List<Book> result = new ArrayList<Book>();
             query = query.toLowerCase();
             for (Book book : books){
                 String titleLowercase = book.getTitle().toLowerCase();
@@ -74,11 +69,10 @@ public class BookService {
                     result.add(book);
                 }
             }
-            return result;
         }else {
             System.err.println("Pass a valid argument!");
-            return null;
         }
+        return result;
     }
 
     public List<Book> listAllBooks(){
