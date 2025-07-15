@@ -1,0 +1,9 @@
+# 1) Ignore everything by default
+*
+
+# 2) But don’t ignore these two entries:
+!/.gitignore
+!/src/
+!/src/**
+
+!/Project Planning.rtf
