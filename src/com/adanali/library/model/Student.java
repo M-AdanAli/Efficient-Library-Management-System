@@ -1,5 +1,7 @@
 package com.adanali.library.model;
 
+import com.adanali.library.util.StringUtil;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -12,8 +14,8 @@ public class Student extends User {
     private int pendingFine;
     private String address;
 
-    public Student(String name, String userId, String password, String address) {
-        super(name, userId, password);
+    public Student(String name, String email, String password, String address) {
+        super(name, email, password);
         setAddress(address);
         borrowedBooks = new ArrayList<>();
     }
@@ -23,10 +25,10 @@ public class Student extends User {
     }
 
     public void setAddress(String address) {
-        if (address == null || address.isEmpty()) {
-            System.err.println("Address cannot be empty!");
-        } else {
+        if (StringUtil.isNotNullOrBlank(address)) {
             this.address = address;
+        } else {
+            System.err.println("Address cannot be empty!");
         }
     }
 
@@ -95,7 +97,7 @@ public class Student extends User {
 
     @Override
     public String toString() {
-        return String.format("Student[ID=%s, Name=%s, Address=%s, PendingFine=%d]",
-                getUserId(), getName(), address, pendingFine);
+        return String.format("Student[E-mail=%s, Name=%s, Address=%s, PendingFine=%d]",
+                getEmail(), getName(), address, pendingFine);
     }
 }
