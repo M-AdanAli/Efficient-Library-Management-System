@@ -1,6 +1,7 @@
 package com.adanali.library.service;
 
 import com.adanali.library.model.User;
+import com.adanali.library.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,26 +15,26 @@ public class UserService {
     }
 
     public void addUser(User user){
-        if (user != null && getUserById(user.getUserId()) == null){
+        if (user != null && getUserByEmail(user.getEmail()) == null){
             users.add(user);
         }else {
             System.err.println("Pass a valid user!");
         }
     }
 
-    public boolean removeUser(String userId){
-        if (userId != null && !userId.isEmpty() && userId.matches("\\d+")){
-            return users.removeIf(u -> u.getUserId().equals(userId));
+    public boolean removeUser(String email){
+        if (StringUtil.isValidEmail(email)){
+            return users.removeIf(u -> u.getEmail().equals(email));
         }else {
-            System.err.println("Pass a valid UserId!");
+            System.err.println("Pass a valid E-mail!");
         }
         return false;
     }
 
-    public boolean updateUser(String userId , User user){
-        if (userId != null && !userId.isEmpty() && userId.matches("\\d+") && user!=null){
+    public boolean updateUser(String email, User user){
+        if (StringUtil.isValidEmail(email) && user!=null){
             for (int i=0 ; i<users.size() ; i++){
-                if (users.get(i).getUserId().equals(userId)){
+                if (users.get(i).getEmail().equals(email)){
                     users.set(i , user);
                     return true;
                 }
@@ -44,15 +45,15 @@ public class UserService {
         return false;
     }
 
-    public User getUserById(String userId){
-        if(userId != null && !userId.isEmpty() && userId.matches("\\d+")){
+    public User getUserByEmail(String email){
+        if(StringUtil.isValidEmail(email)){
             for (User user : users){
-                if (user.getUserId().equals(userId)){
+                if (user.getEmail().equals(email)){
                     return user;
                 }
             }
         }else {
-            System.err.println("Pass a valid UserId!");
+            System.err.println("Pass a valid E-mail!");
         }
         return null;
     }
@@ -63,12 +64,12 @@ public class UserService {
 
     public List<User> searchUser(String query){
         List<User> result = new ArrayList<>();
-        if (query != null && !query.isEmpty()){
+        if (StringUtil.isNotNullOrBlank(query)){
             query = query.toLowerCase();
             for(User user : users){
-                String userIdLowercase = user.getUserId().toLowerCase();
+                String emailLowercase = user.getEmail().toLowerCase();
                 String nameLowercase = user.getName().toLowerCase();
-               if (userIdLowercase.contains(query) || nameLowercase.contains(query)){
+               if (emailLowercase.contains(query) || nameLowercase.contains(query)){
                    result.add(user);
                }
             }
