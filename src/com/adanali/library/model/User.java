@@ -1,16 +1,18 @@
 package com.adanali.library.model;
 
+import com.adanali.library.util.StringUtil;
+
 /**
  * Abstract base class representing a user in the library system.
  */
 public abstract class User {
     private String name;
-    private String userId;
+    private String email;
     private String password;
 
-    public User(String name, String userId, String password) {
+    public User(String name, String email, String password) {
         setName(name);
-        setUserId(userId);
+        setEmail(email);
         setPassword(password);
     }
 
@@ -19,22 +21,22 @@ public abstract class User {
     }
 
     public void setName(String name) {
-        if (name == null || name.isEmpty()) {
-            System.err.println("Name cannot be empty!");
-        } else {
+        if (StringUtil.isNotNullOrBlank(name)) {
             this.name = name;
+        } else {
+            System.err.println("Name cannot be empty!");
         }
     }
 
-    public String getUserId() {
-        return userId;
+    public String getEmail() {
+        return email;
     }
 
-    public void setUserId(String userId) {
-        if (userId == null || userId.isEmpty()) {
-            System.err.println("User Id cannot be empty!");
+    public void setEmail(String email) {
+        if (StringUtil.isValidEmail(email)) {
+            this.email = email;
         } else {
-            this.userId = userId;
+            System.err.println("Pass a valid email.");
         }
     }
 
@@ -43,8 +45,7 @@ public abstract class User {
     }
 
     public void setPassword(String password) {
-        // For now, only digits allowed. Will relax it later
-        if (password == null || password.isEmpty() || !password.matches("\\d+")) {
+        if (StringUtil.isValidPassword(password)) {
             System.err.println("Not a valid Password");
         } else {
             this.password = password;
@@ -58,6 +59,6 @@ public abstract class User {
 
     @Override
     public String toString() {
-        return String.format("User[ID=%s, Name=%s, Role=%s]", userId, name, getRole());
+        return String.format("User[E-mail=%s, Name=%s, Role=%s]", email, name, getRole());
     }
 }
