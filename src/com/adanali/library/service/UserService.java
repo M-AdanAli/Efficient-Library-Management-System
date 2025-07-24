@@ -14,6 +14,16 @@ public class UserService {
         users = new ArrayList<>();
     }
 
+    public String authenticate(String email, String password){
+        if (StringUtil.isValidEmail(email)){
+            User user = getUserByEmail(email);
+            if (user != null && user.getPassword().equals(password)){
+                return user.getRole();
+            }
+        }
+        return null;
+    }
+
     public void addUser(User user){
         if (user != null && getUserByEmail(user.getEmail()) == null){
             users.add(user);
@@ -24,23 +34,35 @@ public class UserService {
 
     public boolean removeUser(String email){
         if (StringUtil.isValidEmail(email)){
-            return users.removeIf(u -> u.getEmail().equals(email));
+            return users.removeIf(u -> u.getEmail().equalsIgnoreCase(email));
         }else {
             System.err.println("Pass a valid E-mail!");
         }
         return false;
     }
 
-    public boolean updateUser(String email, User user){
-        if (StringUtil.isValidEmail(email) && user!=null){
-            for (int i=0 ; i<users.size() ; i++){
-                if (users.get(i).getEmail().equals(email)){
-                    users.set(i , user);
-                    return true;
-                }
+    public boolean updateUserName(String email, String newName){
+        if (StringUtil.isValidEmail(email) && StringUtil.isNotNullOrBlank(newName)){
+            User user = getUserByEmail(email);
+            if (user != null){
+                user.setName(newName);
+                return true;
             }
         }else {
-            System.err.println("Pass valid Arguments!");
+            System.err.println("Invalid email or name!");
+        }
+        return false;
+    }
+
+    public boolean updatePassword(String email, String newPassword){
+        if (StringUtil.isValidEmail(email) && StringUtil.isValidPassword(newPassword)){
+            User user = getUserByEmail(email);
+            if (user != null){
+                user.setPassword(newPassword);
+                return true;
+            }
+        }else {
+            System.err.println("Invalid email or new Password!");
         }
         return false;
     }
@@ -48,10 +70,11 @@ public class UserService {
     public User getUserByEmail(String email){
         if(StringUtil.isValidEmail(email)){
             for (User user : users){
-                if (user.getEmail().equals(email)){
+                if (user.getEmail().equalsIgnoreCase(email)){
                     return user;
                 }
             }
+            System.err.println("User does not exists!");
         }else {
             System.err.println("Pass a valid E-mail!");
         }
@@ -73,10 +96,8 @@ public class UserService {
                    result.add(user);
                }
             }
-        }else {
-            System.err.println("Pass a valid query");
         }
-        return result;
+        return Collections.unmodifiableList(result);
     }
 
 }

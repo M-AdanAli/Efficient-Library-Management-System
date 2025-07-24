@@ -2,6 +2,8 @@ package com.adanali.library.model;
 
 import com.adanali.library.util.StringUtil;
 
+import java.util.Objects;
+
 /**
  * Abstract base class representing a user in the library system.
  */
@@ -46,9 +48,9 @@ public abstract class User {
 
     public void setPassword(String password) {
         if (StringUtil.isValidPassword(password)) {
-            System.err.println("Not a valid Password");
-        } else {
             this.password = password;
+        } else {
+            System.err.println("Not a valid Password");
         }
     }
 
@@ -56,6 +58,18 @@ public abstract class User {
      * Abstract method to get the user's role.
      */
     public abstract String getRole();
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof User)) return false;
+        User user = (User) o;
+        return Objects.equals(getName(), user.getName()) && Objects.equals(getEmail(), user.getEmail()) && Objects.equals(getPassword(), user.getPassword());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getName(), getEmail(), getPassword());
+    }
 
     @Override
     public String toString() {
