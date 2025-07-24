@@ -51,4 +51,11 @@ public class StringUtil {
         }
         return false;
     }
+
+    public static boolean isValidBorrowingStatus(String status){
+        if (isNotNullOrBlank(status)){
+            return (status.equalsIgnoreCase("Active") || status.equalsIgnoreCase("Returned") || status.equalsIgnoreCase("Overdue"));
+        }
+        return false;
+    }
 }

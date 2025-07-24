@@ -1,5 +1,7 @@
 package com.adanali.library.model;
 
+import com.adanali.library.util.StringUtil;
+
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -7,20 +9,21 @@ public class BorrowingRecord {
 
     private String recordId;
     private final Book book;
-    private final User borrower;
+    private final Borrower borrower;
     private final LocalDate borrowDate;
     private final LocalDate dueDate;
     private LocalDate returnDate;
     private String status;
     private int fine;
 
-    public BorrowingRecord(String recordId, Book book, User borrower, LocalDate borrowDate, LocalDate dueDate) {
+    public BorrowingRecord(String recordId, Book book, Borrower borrower, LocalDate borrowDate, LocalDate dueDate) {
         this.recordId = recordId;
         this.book = book;
         this.borrower = borrower;
         this.borrowDate = borrowDate;
         this.dueDate = dueDate;
-        status = "Active";
+        fine=0;
+        updateStatus();
     }
 
     public String getRecordId() {
@@ -28,10 +31,10 @@ public class BorrowingRecord {
     }
 
     public void setRecordId(String recordId) {
-        if (recordId == null || recordId.isEmpty() || !recordId.matches("\\d+")){
-            System.err.println("Invalid Record ID!");
-        }else {
+        if (StringUtil.isNumber(recordId)){
             this.recordId = recordId;
+        }else {
+            System.err.println("Invalid Record ID!");
         }
     }
 
@@ -39,7 +42,7 @@ public class BorrowingRecord {
         return book;
     }
 
-    public User getBorrower() {
+    public Borrower getBorrower() {
         return borrower;
     }
 
@@ -55,14 +58,16 @@ public class BorrowingRecord {
         return returnDate;
     }
 
-    public void setReturnDate(LocalDate returnDate) {
-        if (returnDate != null && returnDate.isAfter(borrowDate)){
+    public boolean setReturnDate(LocalDate returnDate) {
+        if (returnDate != null && !returnDate.isBefore(getBorrowDate())){
             this.returnDate = returnDate;
             updateStatus();
+            updateFine();
+            return true;
         }else {
             System.err.println("Pass a valid return date!");
         }
-
+        return false;
     }
 
     public String getStatus() {
@@ -74,7 +79,11 @@ public class BorrowingRecord {
      */
     public void updateStatus() {
         if (returnDate != null) {
-            status = "Returned";
+            if (returnDate.isAfter(dueDate)){
+                status = "Overdue";
+            }else {
+                status = "Returned";
+            }
         } else if (LocalDate.now().isAfter(dueDate)) {
             status = "Overdue";
         } else {
@@ -89,6 +98,7 @@ public class BorrowingRecord {
     public void setFine(int fine) {
         if (fine >= 0){
             this.fine = fine;
+            borrower.addPendingFine(fine);
         }else{
             System.err.println("Fine cannot be negative!");
         }
@@ -99,10 +109,27 @@ public class BorrowingRecord {
         if (Objects.equals(status, "Overdue")) {
             days = dueDate.datesUntil(LocalDate.now()).count();
         }
-        else if(returnDate != null && returnDate.isAfter(dueDate)){
-            days = dueDate.datesUntil(returnDate).count();
-        }
         int fine = (int) (30 * days);
         setFine(fine);
     }
+
+    @Override
+    public String toString() {
+        return String.format("BorrowingRecord[RecordId=%s, Book=%s, Borrower=%s, BorrowDate=%s, DueDate=%s, ReturnDate=%s, status=%s, fine=%s]", getRecordId(), getBorrowedBook(), getBorrower(), getBorrowDate(), getDueDate(), getReturnDate(), getStatus(), getFine() );
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(!(obj instanceof BorrowingRecord)) {
+            return false;
+        }
+        BorrowingRecord other = (BorrowingRecord) obj;
+        return Objects.equals(this.getRecordId(),other.getRecordId());
+    }
+
+    @Override
+    public int hashCode() {
+        return recordId.hashCode();
+    }
+
 }
