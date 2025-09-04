@@ -13,7 +13,7 @@ public class BorrowingRecord {
     private final LocalDate borrowDate;
     private final LocalDate dueDate;
     private LocalDate returnDate;
-    private String status;
+    private BorrowingStatus status;
     private int fine;
 
     public BorrowingRecord(String recordId, Book book, Borrower borrower, LocalDate borrowDate, LocalDate dueDate) {
@@ -30,11 +30,13 @@ public class BorrowingRecord {
         return recordId;
     }
 
-    public void setRecordId(String recordId) {
+    public boolean setRecordId(String recordId) {
         if (StringUtil.isNumber(recordId)){
             this.recordId = recordId;
+            return true;
         }else {
             System.err.println("Invalid Record ID!");
+            return false;
         }
     }
 
@@ -70,7 +72,7 @@ public class BorrowingRecord {
         return false;
     }
 
-    public String getStatus() {
+    public BorrowingStatus getStatus() {
         return status;
     }
 
@@ -80,14 +82,14 @@ public class BorrowingRecord {
     public void updateStatus() {
         if (returnDate != null) {
             if (returnDate.isAfter(dueDate)){
-                status = "Overdue";
+                status = BorrowingStatus.OVERDUE;
             }else {
-                status = "Returned";
+                status = BorrowingStatus.RETURNED;
             }
         } else if (LocalDate.now().isAfter(dueDate)) {
-            status = "Overdue";
+            status = BorrowingStatus.OVERDUE;
         } else {
-            status = "Active";
+            status = BorrowingStatus.ACTIVE;
         }
     }
 
@@ -95,22 +97,24 @@ public class BorrowingRecord {
         return fine;
     }
 
-    public void setFine(int fine) {
+    public boolean setFine(int fine) {
         if (fine >= 0){
             this.fine = fine;
             borrower.addPendingFine(fine);
+            return true;
         }else{
             System.err.println("Fine cannot be negative!");
+            return false;
         }
     }
 
     public void updateFine() {
-        long days = 0;
-        if (Objects.equals(status, "Overdue")) {
-            days = dueDate.datesUntil(LocalDate.now()).count();
+        int fineToUpdate = 0;
+        if (Objects.equals(status, BorrowingStatus.OVERDUE)) {
+            long daysOverdue = dueDate.datesUntil(returnDate).count();
+            fineToUpdate = (int) (30 * daysOverdue);
         }
-        int fine = (int) (30 * days);
-        setFine(fine);
+        setFine(fineToUpdate);
     }
 
     @Override
