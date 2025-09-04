@@ -52,9 +52,9 @@ public class StringUtil {
         return false;
     }
 
-    public static boolean isValidBorrowingStatus(String status){
-        if (isNotNullOrBlank(status)){
-            return (status.equalsIgnoreCase("Active") || status.equalsIgnoreCase("Returned") || status.equalsIgnoreCase("Overdue"));
+    public static boolean isValidBookSearchAttribute(String attribute){
+        if (isNotNullOrBlank(attribute)){
+            return (attribute.equalsIgnoreCase("title") || attribute.equalsIgnoreCase("author") || attribute.equalsIgnoreCase("genre") || attribute.equalsIgnoreCase("all"));
         }
         return false;
     }
