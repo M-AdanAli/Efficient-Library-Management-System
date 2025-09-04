@@ -1,113 +1,128 @@
 package com.adanali.library.service;
 
 import com.adanali.library.model.Book;
+import com.adanali.library.repository.BooksRepository;
 import com.adanali.library.util.StringUtil;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class BookService {
-    private List<Book> books;
+    private BooksRepository booksRepository;
 
     public BookService(){
-        books = new ArrayList<>();
+        booksRepository = new BooksRepository();
     }
 
-    public void addBook(Book book){
-        if (book != null && searchBookByIsbn(book.getIsbn()) == null){
-            books.add(book);
+    public boolean addBook(Book book){
+        if (book != null){
+            return booksRepository.add(book);
         } else {
-            System.err.println("Book already exists or invalid input!");
+            System.err.println("Invalid input!");
+            return false;
         }
     }
 
     public boolean removeBook(String isbn){
         if (StringUtil.isValidIsbn(isbn)){
-            return books.removeIf(b -> b.getIsbn().equals(isbn));
+            return booksRepository.remove(isbn);
         }else {
             System.err.println("Pass a valid ISBN Number!");
+            return false;
         }
-        return false;
     }
 
-    public boolean updateBook(String isbn, Book updatedBook){
-        if (updatedBook != null && StringUtil.isValidIsbn(isbn)){
-            for (int i = 0; i < books.size(); i++) {
-                if (books.get(i).getIsbn().equals(isbn)) {
-                    books.set(i, updatedBook);
-                    return true;
-                }
-            }
-        }else {
-            System.err.println("Pass valid Arguments!");
-        }
-        return false;
-    }
-
-    public Book searchBookByIsbn(String isbn){
+    public Optional<Book> getBookByIsbn(String isbn){
         if (StringUtil.isValidIsbn(isbn)){
-            for (Book book : books){
-                if (book.getIsbn().equals(isbn)){
-                    return book;
-                }
-            }
-        }else {
-            System.err.println("Pass a valid ISBN number!");
+            return booksRepository.getById(isbn);
+        }else{
+            System.out.println("Invalid Isbn");
+            return Optional.empty();
         }
-        return null;
-    }
-
-    public List<Book> searchBook(String query){
-        List<Book> result = new ArrayList<Book>();
-        if (StringUtil.isNotNullOrBlank(query)){
-            query = query.toLowerCase();
-            for (Book book : books){
-                String titleLowercase = book.getTitle().toLowerCase();
-                String authorLowercase = book.getAuthor().toLowerCase();
-                String genreLowercase = book.getGenre().toLowerCase();
-                if (titleLowercase.contains(query) || authorLowercase.contains(query) || genreLowercase.contains(query)){
-                    result.add(book);
-                }
-            }
-        }else {
-            System.err.println("Pass a valid argument!");
-        }
-        return Collections.unmodifiableList(result);
-    }
-
-    public List<Book> searchBookByTitle(String title) {
-        List<Book> result = new ArrayList<>();
-        if (StringUtil.isNotNullOrBlank(title)) {
-            title = title.toLowerCase();
-            for (Book book : books) {
-                if (book.getTitle().toLowerCase().contains(title)) {
-                    result.add(book);
-                }
-            }
-        }
-        return Collections.unmodifiableList(result);
-    }
-
-    public List<Book> searchBookByAuthor(String author) {
-        List<Book> result = new ArrayList<>();
-        if (StringUtil.isNotNullOrBlank(author)) {
-            author = author.toLowerCase();
-            for (Book book : books) {
-                if (book.getAuthor().toLowerCase().contains(author)) {
-                    result.add(book);
-                }
-            }
-        }
-        return Collections.unmodifiableList(result);
     }
 
     public List<Book> listAllBooks(){
-        return Collections.unmodifiableList(books);
+        return booksRepository.getAll();
+    }
+
+    public boolean updateBookTitle(String isbn, String newTitle) {
+        Book book = getBookByIsbn(isbn).get();
+        if (book != null && StringUtil.isNotNullOrBlank(newTitle)) {
+            book.setTitle(newTitle);
+            return true;
+        }else {
+            System.err.println("Book does not exists OR Invalid Title!");
+            return false;
+        }
+    }
+
+    public boolean updateBookAuthor(String isbn, String author) {
+        Book book = getBookByIsbn(isbn).get();
+        if (book != null && StringUtil.isNotNullOrBlank(author)) {
+            book.setAuthor(author);
+            return true;
+        }else {
+            System.err.println("Book does not exists OR Invalid Author!");
+            return false;
+        }
+    }
+
+    public boolean updateBookGenre(String isbn, String genre) {
+        Book book = getBookByIsbn(isbn).get();
+        if (book != null && StringUtil.isNotNullOrBlank(genre)) {
+            book.setGenre(genre);
+            return true;
+        }else {
+            System.err.println("Book does not exists OR Invalid Genre!");
+            return false;
+        }
+    }
+
+    public boolean updateBookPublicationDate(String isbn, LocalDate publicationDate) {
+        Book book = getBookByIsbn(isbn).get();
+        if (book != null && publicationDate != null) {
+            book.setPublicationDate(publicationDate);
+            return true;
+        }else {
+            System.err.println("Book does not exists OR Invalid Publication Date!");
+        }
+        return false;
+    }
+
+    public boolean increaseBookQuantity(String isbn, int value) {
+        Book book = getBookByIsbn(isbn).get();
+        if (book != null && value>0) {
+            book.changeQuantityByValue(value);
+            return true;
+        }else {
+            System.err.println("Book does not exists OR Invalid increment!");
+            return false;
+        }
+    }
+
+    public boolean decreaseBookQuantity(String isbn, int value) {
+        Book book = getBookByIsbn(isbn).get();
+        if (book != null && value>0) {
+            book.changeQuantityByValue(-value);
+            return true;
+        }else {
+            System.err.println("Book does not exists OR Invalid decrement!");
+            return false;
+        }
+    }
+
+    public List<Book> searchBooks(String query , BooksRepository.SearchAttribute searchAttribute){
+        if (StringUtil.isNotNullOrBlank(query)){
+            return booksRepository.searchBooks(query,searchAttribute);
+        }
+        return Collections.unmodifiableList(new ArrayList<>(0));
     }
 
     public boolean isBookAvailable(String isbn){
-            Book b = searchBookByIsbn(isbn);
-            return b!=null && b.getQuantity()>0;
+            Optional<Book> book = getBookByIsbn(isbn);
+            return book.isPresent() && book.get().getQuantity()>0;
     }
 }
