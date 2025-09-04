@@ -18,11 +18,13 @@ public class Student extends User implements Borrower{
         return address;
     }
 
-    public void setAddress(String address) {
+    public boolean setAddress(String address) {
         if (StringUtil.isNotNullOrBlank(address)) {
             this.address = address;
+            return true;
         } else {
             System.err.println("Address cannot be empty!");
+            return false;
         }
     }
 
@@ -32,11 +34,13 @@ public class Student extends User implements Borrower{
     }
 
     @Override
-    public void addPendingFine(int fine) {
+    public boolean addPendingFine(int fine) {
         if (fine > 0) {
             this.pendingFine += fine;
+            return true;
         } else {
             System.err.println("Fine cannot be negative!");
+            return false;
         }
     }
 

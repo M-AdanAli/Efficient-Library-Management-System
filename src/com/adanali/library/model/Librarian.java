@@ -5,8 +5,8 @@ package com.adanali.library.model;
  */
 public class Librarian extends User {
 
-    public Librarian(String name, String userId, String password) {
-        super(name, userId, password);
+    public Librarian(String name, String email, String password) {
+        super(name, email, password);
     }
 
     @Override

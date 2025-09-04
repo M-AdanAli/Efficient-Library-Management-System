@@ -12,7 +12,7 @@ public abstract class User {
     private String email;
     private String password;
 
-    public User(String name, String email, String password) {
+    protected User(String name, String email, String password) {
         setName(name);
         setEmail(email);
         setPassword(password);
@@ -21,12 +21,13 @@ public abstract class User {
     public String getName() {
         return name;
     }
-
-    public void setName(String name) {
+    public boolean setName(String name) {
         if (StringUtil.isNotNullOrBlank(name)) {
             this.name = name;
+            return true;
         } else {
             System.err.println("Name cannot be empty!");
+            return false;
         }
     }
 
@@ -34,11 +35,13 @@ public abstract class User {
         return email;
     }
 
-    public void setEmail(String email) {
+    public boolean setEmail(String email) {
         if (StringUtil.isValidEmail(email)) {
             this.email = email;
+            return true;
         } else {
             System.err.println("Pass a valid email.");
+            return false;
         }
     }
 
@@ -46,11 +49,13 @@ public abstract class User {
         return password;
     }
 
-    public void setPassword(String password) {
+    public boolean setPassword(String password) {
         if (StringUtil.isValidPassword(password)) {
             this.password = password;
+            return true;
         } else {
             System.err.println("Not a valid Password");
+            return false;
         }
     }
 
@@ -63,16 +68,16 @@ public abstract class User {
     public boolean equals(Object o) {
         if (!(o instanceof User)) return false;
         User user = (User) o;
-        return Objects.equals(getName(), user.getName()) && Objects.equals(getEmail(), user.getEmail()) && Objects.equals(getPassword(), user.getPassword());
+        return Objects.equals(this.getEmail(), user.getEmail());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getName(), getEmail(), getPassword());
+        return this.getEmail().hashCode();
     }
 
     @Override
     public String toString() {
-        return String.format("User[E-mail=%s, Name=%s, Role=%s]", email, name, getRole());
+        return String.format("User[E-mail=%s, Name=%s, Role=%s]", getEmail(), getName(), getRole());
     }
 }

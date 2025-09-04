@@ -7,7 +7,7 @@ import java.util.Objects;
 
 public class Book {
 
-    private String isbn;
+    private final String isbn;
     private String title;
     private String authorName;
     private String genre;
@@ -15,7 +15,7 @@ public class Book {
     private int quantity;
 
     public Book(String isbn, String title, String authorName, String genre, LocalDate publicationDate, int quantity) {
-        setIsbn(isbn);
+        this.isbn = isbn;
         setTitle(title);
         setAuthor(authorName);
         setGenre(genre);
@@ -27,89 +27,93 @@ public class Book {
         return isbn;
     }
 
-    public void setIsbn(String inputIsbn) {
-        if (StringUtil.isValidIsbn(inputIsbn)) {
-            this.isbn = inputIsbn;
-        }else {
-            System.err.println("Not a valid ISBN number!");
-        }
-
-    }
-
     public String getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
+    public boolean setTitle(String title) {
         if (StringUtil.isNotNullOrBlank(title)) {
             this.title = title;
+            return true;
         }else{
             System.err.println("Title cannot be empty.");
+            return false;
         }
-
     }
 
     public String getAuthor() {
         return authorName;
     }
 
-    public void setAuthor(String author) {
+    public boolean setAuthor(String author) {
         if (StringUtil.isNotNullOrBlank(author)) {
             this.authorName = author;
+            return true;
         }else{
             System.err.println("Author name cannot be empty.");
+            return false;
         }
-
     }
 
     public String getGenre() {
         return genre;
     }
 
-    public void setGenre(String genre) {
+    public boolean setGenre(String genre) {
         if (StringUtil.isNotNullOrBlank(genre)) {
             this.genre = genre;
+            return true;
         }else{
             System.err.println("Genre cannot be empty.");
+            return false;
         }
-
     }
 
     public LocalDate getPublicationDate() {
         return publicationDate;
     }
 
-    public void setPublicationDate(LocalDate publicationDate) {
+    public boolean setPublicationDate(LocalDate publicationDate) {
         if (publicationDate != null) {
             this.publicationDate = publicationDate;
+            return true;
         }else {
             System.err.println("Publication date cannot be null.");
+            return false;
         }
-
     }
 
     public int getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    private boolean setQuantity(int quantity) {
         if (quantity > 0) {
             this.quantity = quantity;
+            return true;
         }else{
-            System.err.println("Quantity cannot be zero/negative.");
+            System.err.println("Quantity cannot be zero/negative after change");
+            return false;
         }
+    }
+
+    public boolean changeQuantityByValue(int value){
+        if (value != 0){
+            return this.setQuantity(this.getQuantity()+value);
+        }
+        return false;
     }
 
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Book)) return false;
         Book book = (Book) o;
-        return Objects.equals(getIsbn(), book.getIsbn()) && Objects.equals(getTitle(), book.getTitle()) && Objects.equals(authorName, book.authorName) && Objects.equals(getGenre(), book.getGenre()) && Objects.equals(getPublicationDate(), book.getPublicationDate());
+        return Objects.equals(this.getIsbn(), book.getIsbn());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getIsbn(), getTitle(), authorName, getGenre(), getPublicationDate());
+        return this.getIsbn().hashCode();
     }
 
     @Override
