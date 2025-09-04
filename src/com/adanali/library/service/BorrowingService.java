@@ -1,53 +1,54 @@
 package com.adanali.library.service;
 
-import com.adanali.library.model.*;
+import com.adanali.library.model.Book;
+import com.adanali.library.model.Borrower;
+import com.adanali.library.model.BorrowingRecord;
+import com.adanali.library.model.BorrowingStatus;
 import com.adanali.library.util.StringUtil;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class BorrowingService {
-    private List<BorrowingRecord> records;
-    private long recordCounter;
+    private Set<BorrowingRecord> records;
 
     public BorrowingService() {
-        records = new ArrayList<>();
-        recordCounter = 0;
+        records = new HashSet<>();
     }
 
-    public boolean addRecord(BorrowingRecord record){
-        if (record != null && getRecordById(record.getRecordId()) == null){
-            records.add(record);
+    public boolean addRecord(BorrowingRecord borrowingRecord){
+        if (borrowingRecord != null && getRecordById(borrowingRecord.getRecordId()).isEmpty()){
+            records.add(borrowingRecord);
             return true;
+        }else {
+            System.err.println("Record already exists or invalid Input!");
+            return false;
         }
-        System.err.println("Record already exists or invalid Input!");
-        return false;
     }
 
-    public BorrowingRecord getRecordById(String recordId){
-        if (StringUtil.isNumber(recordId)){
-            for (BorrowingRecord record : records){
-                if (record.getRecordId().equals(recordId)){
-                    return record;
-                }
-            }
+    public Optional<BorrowingRecord> getRecordById(String recordId){
+        if (StringUtil.isNotNullOrBlank(recordId)){
+            return records.stream().filter(record -> record.getRecordId().equals(recordId)).findFirst();
         }else {
-            System.err.println("Pass a valid Record Id!");
+            System.err.println("Pass valid record id!");
+            return Optional.empty();
         }
-        return null;
     }
 
     public boolean borrowBook(Borrower borrower , Book book){
         if (borrower != null && book != null){
-            if (book.getQuantity() <= 0 || !borrower.canBorrow()){
-                System.err.println("Sorry! Either book not available for Borrowing OR you have a pending fine.");
+            if (!borrower.canBorrow()){
+                System.err.println("Sorry! borrower has a pending fine.");
                 return false;
             }
-            BorrowingRecord record = new BorrowingRecord(Long.toString(++recordCounter), book, borrower, LocalDate.now(), LocalDate.now().plusWeeks(borrower.getBorrowDurationInWeeks()));
-            if (addRecord(record)){
-                book.setQuantity(book.getQuantity()-1);
+            String newId;
+            do {
+                newId = System.currentTimeMillis()+ "-" + UUID.randomUUID();
+            }while (getRecordById(newId).isPresent());
+            BorrowingRecord newRecord = new BorrowingRecord(newId, book, borrower, LocalDate.now(), LocalDate.now().plusWeeks(borrower.getBorrowDurationInWeeks()));
+            if (addRecord(newRecord)){
+                book.changeQuantityByValue(-1);
                 return true;
             }
         }else {
@@ -59,9 +60,9 @@ public class BorrowingService {
     public boolean returnBook(Borrower borrower, Book book){
         if (borrower != null && book != null ){
             for (BorrowingRecord record : records){
-                if(record.getBorrower().equals(borrower) && record.getBorrowedBook().equals(book) && record.getStatus().equals("Active")){
+                if(record.getBorrower().equals(borrower) && record.getBorrowedBook().equals(book) && record.getStatus().equals(BorrowingStatus.ACTIVE)){
                     if (record.setReturnDate(LocalDate.now())){
-                        book.setQuantity(book.getQuantity()+1);
+                        book.changeQuantityByValue(1);
                         return true;
                     }
                 }
@@ -85,61 +86,50 @@ public class BorrowingService {
         return false;
     }
 
-    public List<BorrowingRecord> getBorrowingsByStatus(String status){
-        List<BorrowingRecord> result = new ArrayList<>();
-        if (StringUtil.isValidBorrowingStatus(status)){
-            for (BorrowingRecord record : records){
-                if (record.getStatus().equalsIgnoreCase(status)){
-                    result.add(record);
-                }
-            }
-        }
-        return Collections.unmodifiableList(result);
+    public List<BorrowingRecord> getBorrowingsByStatus(BorrowingStatus status){
+        return records.stream()
+                .filter(record -> record.getStatus().equals(status))
+                .collect(Collectors.toUnmodifiableList());
     }
 
     public List<BorrowingRecord> getActiveBorrowings(){
-        return getBorrowingsByStatus("Active");
+        return getBorrowingsByStatus(BorrowingStatus.ACTIVE);
     }
 
     public List<BorrowingRecord> getReturnedBorrowings(){
-        return getBorrowingsByStatus("Returned");
+        return getBorrowingsByStatus(BorrowingStatus.RETURNED);
     }
 
     public List<BorrowingRecord> getOverdueBorrowings(){
-        List<BorrowingRecord> result = new ArrayList<>();
-        for (BorrowingRecord record : records){
-            if (record.getReturnDate() == null && LocalDate.now().isAfter(record.getDueDate())){
-                result.add(record);
-            }
-        }
-        return Collections.unmodifiableList(result);
+        return records.stream()
+                .filter(record->( record.getReturnDate() == null ) && LocalDate.now().isAfter( record.getDueDate() ) )
+                .collect(Collectors.toUnmodifiableList());
     }
 
     public List<BorrowingRecord> getBorrowingsByBorrower(Borrower borrower){
-        List<BorrowingRecord> result = new ArrayList<>();
-        if (borrower != null){
-            for (BorrowingRecord record : records){
-                if (record.getBorrower().equals(borrower)){
-                    result.add(record);
-                }
-            }
-        }
-        return Collections.unmodifiableList(result);
+        return records.stream()
+                .filter(record->record.getBorrower().equals(borrower))
+                .collect(Collectors.toUnmodifiableList());
     }
 
     public List<BorrowingRecord> getBorrowingsByBook(Book book){
-        List<BorrowingRecord> result = new ArrayList<>();
-        if (book != null){
-            for (BorrowingRecord record : records){
-                if (record.getBorrowedBook().equals(book)){
-                    result.add(record);
-                }
-            }
-        }
-        return Collections.unmodifiableList(result);
+        return records.stream()
+                .filter(record->record.getBorrowedBook().equals(book))
+                .collect(Collectors.toUnmodifiableList());
     }
 
-    public List<BorrowingRecord> getRecords(){
-        return Collections.unmodifiableList(records);
+    public boolean hasActiveBorrowings (Book book){
+        if (book != null){
+            return records.stream()
+                    .filter(record->record.getBorrowedBook().equals(book))
+                    .anyMatch(record->record.getStatus().equals(BorrowingStatus.ACTIVE));
+        }else {
+            System.err.println("Pass valid Book!");
+            return false;
+        }
+    }
+
+    public List<BorrowingRecord> getAllRecords(){
+        return records.stream().collect(Collectors.toUnmodifiableList());
     }
 }
