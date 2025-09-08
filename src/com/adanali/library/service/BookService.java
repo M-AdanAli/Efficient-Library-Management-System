@@ -1,12 +1,12 @@
 package com.adanali.library.service;
 
+import com.adanali.library.exceptions.EntityDuplicationException;
+import com.adanali.library.exceptions.EntityNotFoundException;
 import com.adanali.library.model.Book;
 import com.adanali.library.repository.BooksRepository;
 import com.adanali.library.util.StringUtil;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,112 +17,72 @@ public class BookService {
         booksRepository = new BooksRepository();
     }
 
-    public boolean addBook(Book book){
-        if (book != null){
-            return booksRepository.add(book);
-        } else {
-            System.err.println("Invalid input!");
-            return false;
+    public void addBook(String isbn,String title,String authorName,String genre,LocalDate publicationDate,int quantity) throws EntityDuplicationException {
+        if (StringUtil.isValidIsbn(isbn)){
+            StringUtil.validateNotNullOrBlank(title,"Title");
+            StringUtil.validateNotNullOrBlank(authorName,"Author's name");
+            StringUtil.validateNotNullOrBlank(genre,"Genre");
+            if (quantity>0){
+                booksRepository.add(new Book(isbn, title, authorName, genre, publicationDate, quantity));
+            }else {
+                throw new IllegalArgumentException("Quantity should be greater than 0");
+            }
         }
     }
 
-    public boolean removeBook(String isbn){
+    public void removeBook(String isbn){
         if (StringUtil.isValidIsbn(isbn)){
-            return booksRepository.remove(isbn);
-        }else {
-            System.err.println("Pass a valid ISBN Number!");
-            return false;
+            booksRepository.remove(isbn);
         }
     }
 
     public Optional<Book> getBookByIsbn(String isbn){
         if (StringUtil.isValidIsbn(isbn)){
             return booksRepository.getById(isbn);
-        }else{
-            System.out.println("Invalid Isbn");
-            return Optional.empty();
-        }
+        }return Optional.empty(); // Unreachable
     }
 
     public List<Book> listAllBooks(){
         return booksRepository.getAll();
     }
 
-    public boolean updateBookTitle(String isbn, String newTitle) {
-        Book book = getBookByIsbn(isbn).get();
-        if (book != null && StringUtil.isNotNullOrBlank(newTitle)) {
-            book.setTitle(newTitle);
-            return true;
-        }else {
-            System.err.println("Book does not exists OR Invalid Title!");
-            return false;
-        }
+    public void updateBookTitle(String isbn, String newTitle) throws EntityNotFoundException {
+        Book book = getBookByIsbn(isbn).orElseThrow(()-> new EntityNotFoundException("Book not found with ISBN : "+isbn));
+        book.setTitle(newTitle);
     }
 
-    public boolean updateBookAuthor(String isbn, String author) {
-        Book book = getBookByIsbn(isbn).get();
-        if (book != null && StringUtil.isNotNullOrBlank(author)) {
-            book.setAuthor(author);
-            return true;
-        }else {
-            System.err.println("Book does not exists OR Invalid Author!");
-            return false;
-        }
+    public void updateBookAuthor(String isbn, String author) throws EntityNotFoundException {
+        Book book = getBookByIsbn(isbn).orElseThrow(()->new EntityNotFoundException("Book not found with ISBN : "+isbn));
+        book.setAuthor(author);
     }
 
-    public boolean updateBookGenre(String isbn, String genre) {
-        Book book = getBookByIsbn(isbn).get();
-        if (book != null && StringUtil.isNotNullOrBlank(genre)) {
-            book.setGenre(genre);
-            return true;
-        }else {
-            System.err.println("Book does not exists OR Invalid Genre!");
-            return false;
-        }
+    public void updateBookGenre(String isbn, String genre) throws EntityNotFoundException {
+        Book book = getBookByIsbn(isbn).orElseThrow(()->new EntityNotFoundException("Book not found with ISBN : "+isbn));
+        book.setGenre(genre);
     }
 
-    public boolean updateBookPublicationDate(String isbn, LocalDate publicationDate) {
-        Book book = getBookByIsbn(isbn).get();
-        if (book != null && publicationDate != null) {
-            book.setPublicationDate(publicationDate);
-            return true;
-        }else {
-            System.err.println("Book does not exists OR Invalid Publication Date!");
-        }
-        return false;
+    public void updateBookPublicationDate(String isbn, LocalDate publicationDate) throws EntityNotFoundException {
+        Book book = getBookByIsbn(isbn).orElseThrow(()->new EntityNotFoundException("Book not found with ISBN : "+isbn));
+        book.setPublicationDate(publicationDate);
     }
 
-    public boolean increaseBookQuantity(String isbn, int value) {
-        Book book = getBookByIsbn(isbn).get();
-        if (book != null && value>0) {
+    public void increaseBookQuantity(String isbn, int value) throws EntityNotFoundException {
+        Book book = getBookByIsbn(isbn).orElseThrow(()->new EntityNotFoundException("Book not found with ISBN : "+isbn));
+        if (value>0) {
             book.changeQuantityByValue(value);
-            return true;
-        }else {
-            System.err.println("Book does not exists OR Invalid increment!");
-            return false;
-        }
+        }else throw new IllegalArgumentException("Invalid increment value");
     }
 
-    public boolean decreaseBookQuantity(String isbn, int value) {
-        Book book = getBookByIsbn(isbn).get();
-        if (book != null && value>0) {
+    public void decreaseBookQuantity(String isbn, int value) throws EntityNotFoundException {
+        Book book = getBookByIsbn(isbn).orElseThrow(()->new EntityNotFoundException("Book not found with ISBN : "+isbn));
+        if (value>0) {
             book.changeQuantityByValue(-value);
-            return true;
-        }else {
-            System.err.println("Book does not exists OR Invalid decrement!");
-            return false;
-        }
+        }else throw new IllegalArgumentException("Invalid decrement value");
     }
 
     public List<Book> searchBooks(String query , BooksRepository.SearchAttribute searchAttribute){
-        if (StringUtil.isNotNullOrBlank(query)){
-            return booksRepository.searchBooks(query,searchAttribute);
-        }
-        return Collections.unmodifiableList(new ArrayList<>(0));
+        StringUtil.validateNotNullOrBlank(query,"Search Query");
+        return booksRepository.searchBooks(query,searchAttribute);
     }
 
-    public boolean isBookAvailable(String isbn){
-            Optional<Book> book = getBookByIsbn(isbn);
-            return book.isPresent() && book.get().getQuantity()>0;
-    }
 }

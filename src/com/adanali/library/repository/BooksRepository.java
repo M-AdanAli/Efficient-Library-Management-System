@@ -1,5 +1,6 @@
 package com.adanali.library.repository;
 
+import com.adanali.library.exceptions.EntityDuplicationException;
 import com.adanali.library.model.Book;
 
 import java.util.*;
@@ -33,12 +34,10 @@ public class BooksRepository implements RepositoryPattern<Book,String>{
     }
 
     @Override
-    public boolean add(Book book) {
+    public void add(Book book) throws EntityDuplicationException {
         if (getById(book.getIsbn()).isEmpty()){
             bookSet.add(book);
-            return true;
-        }
-        return false;
+        }else throw new EntityDuplicationException(book.getClass(),"Book with ISBN ("+book.getIsbn()+") already exists!");
     }
 
     @Override

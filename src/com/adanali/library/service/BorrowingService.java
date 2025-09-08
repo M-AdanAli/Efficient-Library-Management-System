@@ -1,5 +1,6 @@
 package com.adanali.library.service;
 
+import com.adanali.library.exceptions.EntityDuplicationException;
 import com.adanali.library.model.Book;
 import com.adanali.library.model.Borrower;
 import com.adanali.library.model.BorrowingRecord;
@@ -17,73 +18,43 @@ public class BorrowingService {
         records = new HashSet<>();
     }
 
-    public boolean addRecord(BorrowingRecord borrowingRecord){
-        if (borrowingRecord != null && getRecordById(borrowingRecord.getRecordId()).isEmpty()){
+    public void addRecord(String recordId, Book book, Borrower borrower, LocalDate borrowDate, LocalDate dueDate) throws EntityDuplicationException {
+        BorrowingRecord borrowingRecord = new BorrowingRecord(recordId, book, borrower, borrowDate, dueDate);
+        if (getRecordById(borrowingRecord.getRecordId()).isEmpty()){
             records.add(borrowingRecord);
-            return true;
-        }else {
-            System.err.println("Record already exists or invalid Input!");
-            return false;
-        }
+        }else throw new EntityDuplicationException(BorrowingRecord.class, "Record already exists!");
     }
 
     public Optional<BorrowingRecord> getRecordById(String recordId){
-        if (StringUtil.isNotNullOrBlank(recordId)){
-            return records.stream().filter(record -> record.getRecordId().equals(recordId)).findFirst();
-        }else {
-            System.err.println("Pass valid record id!");
-            return Optional.empty();
-        }
+        StringUtil.validateNotNullOrBlank(recordId,"Record ID");
+        return records.stream().filter(record -> record.getRecordId().equals(recordId)).findFirst();
     }
 
-    public boolean borrowBook(Borrower borrower , Book book){
-        if (borrower != null && book != null){
-            if (!borrower.canBorrow()){
-                System.err.println("Sorry! borrower has a pending fine.");
-                return false;
-            }
-            String newId;
-            do {
-                newId = System.currentTimeMillis()+ "-" + UUID.randomUUID();
-            }while (getRecordById(newId).isPresent());
-            BorrowingRecord newRecord = new BorrowingRecord(newId, book, borrower, LocalDate.now(), LocalDate.now().plusWeeks(borrower.getBorrowDurationInWeeks()));
-            if (addRecord(newRecord)){
+    public void borrowBook(Borrower borrower , Book book) throws EntityDuplicationException {
+        if (borrower.canBorrow()){
+            if (book.isAvailableForBorrow()){
+                String newId;
+                do {
+                    newId = System.currentTimeMillis()+ "-" + UUID.randomUUID();
+                }while (getRecordById(newId).isPresent());
+                addRecord(newId, book, borrower, LocalDate.now(), LocalDate.now().plusWeeks(borrower.getBorrowDurationInWeeks()));
                 book.changeQuantityByValue(-1);
-                return true;
-            }
-        }else {
-            System.err.println("Invalid Arguments!");
-        }
-        return false;
+            }else throw new IllegalStateException("Book is not available for borrowing right now.");
+        }else throw new IllegalStateException("Borrower has a pending fine!");
     }
 
-    public boolean returnBook(Borrower borrower, Book book){
-        if (borrower != null && book != null ){
-            for (BorrowingRecord record : records){
-                if(record.getBorrower().equals(borrower) && record.getBorrowedBook().equals(book) && record.getStatus().equals(BorrowingStatus.ACTIVE)){
-                    if (record.setReturnDate(LocalDate.now())){
-                        book.changeQuantityByValue(1);
-                        return true;
-                    }
-                }
-            }
-            System.err.println("Borrowing Record not Found!");
-        }else {
-            System.err.println("Invalid Arguments!");
-        }
-        return false;
+    public void returnBook(Borrower borrower, Book book){
+        BorrowingRecord borrowingRecord = records.stream().filter(record -> record.getBorrower().equals(borrower) && record.getBorrowedBook().equals(book) && record.getStatus().equals(BorrowingStatus.ACTIVE)).findFirst().orElseThrow(()->new IllegalStateException("Borrower does not have an active borrowing record for the book : "+book.getTitle()));
+        borrowingRecord.setReturnDate(LocalDate.now());
+        book.changeQuantityByValue(1);
     }
 
-    public boolean payFine(Borrower borrower, int amount){
-        if (borrower!=null && amount > 0){
+    public void payFine(Borrower borrower, int amount){
+        if (amount > 0){
             if (borrower.getPendingFine() > 0 ){
-                return borrower.reducePendingFine(amount);
-            }else {
-                System.err.println("No pending fine");
-                return false;
-            }
-        }
-        return false;
+                borrower.reducePendingFine(amount);
+            }else throw new IllegalStateException("No pending fine");
+        }else throw new IllegalArgumentException("Invalid payment amount!");
     }
 
     public List<BorrowingRecord> getBorrowingsByStatus(BorrowingStatus status){
@@ -123,10 +94,7 @@ public class BorrowingService {
             return records.stream()
                     .filter(record->record.getBorrowedBook().equals(book))
                     .anyMatch(record->record.getStatus().equals(BorrowingStatus.ACTIVE));
-        }else {
-            System.err.println("Pass valid Book!");
-            return false;
-        }
+        }else throw new IllegalArgumentException("Pass valid Book!");
     }
 
     public List<BorrowingRecord> getAllRecords(){

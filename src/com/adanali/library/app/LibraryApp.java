@@ -17,21 +17,18 @@ public class LibraryApp {
         do {
             ConsoleUtil.clearConsole();
             loginScreen();
-            ConsoleUtil.delay(500);
             if (currentUser == null){
                 ConsoleUtil.printNewLines(2);
                 System.out.println("Wanna Retry?");
-                System.out.println("Yes - Enter \"1\"");
+                System.out.println("Yes - Enter \"y\"");
                 System.out.println("No - Enter any key");
-                if (!ConsoleUtil.inputString("Enter").equals("1")) {
+                if (!ConsoleUtil.inputString("Enter").equals("y")) {
                     reRun = false;
                 }
             }else {
                 homeScreen(currentUser);
             }
         }while (reRun);
-
-
     }
 
     private static void loginScreen(){
@@ -41,7 +38,8 @@ public class LibraryApp {
         String email = ConsoleUtil.inputString("Enter E-mail");
         String password = ConsoleUtil.inputString("Enter Password");
 
-        currentUser = library.login(email,password);
+        currentUser = library.login(email,password).orElse(null);
+        ConsoleUtil.delay(800);
     }
 
     private static void homeScreen(User user){
@@ -127,31 +125,27 @@ public class LibraryApp {
             String choice = ConsoleUtil.inputString("Enter your choice");
             switch (choice){
                 case "1":
-                    while (true){
-                        String newUserName = ConsoleUtil.inputString("Enter new Username");
-                        if (library.updateUserName(currentUser.getEmail(), newUserName)) {break;}
-                    }
+                    String newUserName = ConsoleUtil.inputString("Enter new Username");
+                    library.updateUserName(currentUser.getEmail(), newUserName);
+                    ConsoleUtil.delay(500);
                     break;
                 case "2":
                     while (true){
                         String passwordToCheck = ConsoleUtil.inputString("Enter current password");
                         if (passwordToCheck.equals(currentUser.getPassword())){
                             String newPassword = ConsoleUtil.inputString("Enter new password");
-                            if (library.updateUserPassword(currentUser.getEmail(), newPassword)){
-                                exit = true;
-                                break;
-                            }
-                        }else {
-                            System.err.println("Password does not match!");
+                            library.updateUserPassword(currentUser.getEmail(), newPassword);
+                            break;
                         }
                     }
+                    ConsoleUtil.delay(500);
                     break;
                 case "3":
                     exit = true;
                     break;
                 default:
                     System.out.println("Invalid choice!");
-                    ConsoleUtil.delay(1000);
+                    ConsoleUtil.delay(800);
             }
         }
     }
@@ -171,48 +165,16 @@ public class LibraryApp {
             String choice = ConsoleUtil.inputString("Enter your choice");
             switch (choice){
                 case "1":
-                    while (true){
-                        User userToAdd = new Student(ConsoleUtil.inputString("Enter the name of student"),
-                                ConsoleUtil.inputString("Enter the email of student"),
-                                ConsoleUtil.inputString("Enter the password of student"),
-                                ConsoleUtil.inputString("Enter the address of student"));
-                        if (library.registerStudent(userToAdd)){break;}
-                    }
+                    addStudentPage();
                     break;
                 case "2":
-                    String emailOfTheStudentToRemove = ConsoleUtil.inputString("Enter the email of the Student");
-                    if (library.removeStudent(emailOfTheStudentToRemove)){
-                        System.out.println("Student removed successfully");
-                    }else {
-                        System.out.println("No such Student Exists!");
-                    }
+                    removeStudentPage();
                     break;
                 case "3":
-                    boolean reRun = true;
-                    while (reRun){
-                        System.out.println("1 - Librarians");
-                        System.out.println("2 - Students");
-                        System.out.println("3 - Go Back");
-                        String innerChoice = ConsoleUtil.inputString("Enter your choice");
-                        switch (innerChoice){
-                            case "1":
-                                library.printAllLibrarians();
-                                break;
-                            case "2":
-                                library.printAllStudents();
-                                break;
-                            case "3":
-                                reRun = false;
-                                break;
-                            default:
-                                System.err.println("Invalid Choice! Retry...");
-                        }
-                    }
+                    userListPage();
                     break;
                 case "4":
-                    String searchQuery = ConsoleUtil.inputString("Enter search query");
-                    library.searchForUser(searchQuery);
-                    ConsoleUtil.delay(3500);
+                    userSearchPage();
                     break;
                 case "5":
                     exit=true;
@@ -221,8 +183,51 @@ public class LibraryApp {
                     System.err.println("Invalid Input! Try Again...");
             }
         }
+    }
 
+    private static void addStudentPage(){
+           library.registerStudent(ConsoleUtil.inputString("Enter the name of student"),
+                    ConsoleUtil.inputString("Enter the email of student"),
+                    ConsoleUtil.inputString("Enter the password of student"),
+                    ConsoleUtil.inputString("Enter the address of student"));
+           ConsoleUtil.delay(500);
+    }
 
+    private static void removeStudentPage(){
+        String emailOfTheStudentToRemove = ConsoleUtil.inputString("Enter the email of the Student");
+        library.removeStudent(emailOfTheStudentToRemove);
+        ConsoleUtil.delay(500);
+    }
+
+    private static void userListPage(){
+        boolean reRun = true;
+        while (reRun){
+            System.out.println("1 - Librarians");
+            System.out.println("2 - Students");
+            System.out.println("3 - Go Back");
+            String innerChoice = ConsoleUtil.inputString("Enter your choice");
+            switch (innerChoice){
+                case "1":
+                    library.printAllLibrarians();
+                    ConsoleUtil.delay(2000);
+                    break;
+                case "2":
+                    library.printAllStudents();
+                    ConsoleUtil.delay(2000);
+                    break;
+                case "3":
+                    reRun = false;
+                    break;
+                default:
+                    System.err.println("Invalid Choice! Retry...");
+            }
+        }
+    }
+
+    private static void userSearchPage(){
+        String searchQuery = ConsoleUtil.inputString("Enter search query");
+        library.searchForUser(searchQuery);
+        ConsoleUtil.delay(2000);
     }
 
     private static void manageBooks(){
@@ -242,77 +247,13 @@ public class LibraryApp {
 
             switch (userChoice) {
                 case "1":
-                    boolean isBookAdded = library.addNewBook(ConsoleUtil.inputString("Enter the ISBN"),
-                            ConsoleUtil.inputString("Enter the Title"),
-                            ConsoleUtil.inputString("Enter Author name"),
-                            ConsoleUtil.inputString("Enter Genre"),
-                            ConsoleUtil.inputDate("Enter the Publication Date"),
-                            ConsoleUtil.inputInteger("Enter the number of copies being added"));
-                    if (isBookAdded) {
-                        System.out.println("Book Added successfully");
-                    } else {
-                        System.out.println("Failed to add book");
-                    }
+                    addBookPage();
                     break;
                 case "2":
-                    String isbnOfTheBookToRemove = ConsoleUtil.inputString("Enter the ISBN of the book to remove");
-                    if (library.removeABook(isbnOfTheBookToRemove)) {
-                        System.out.println("Book removed successfully");
-                    } else {
-                        System.out.println("Failed to remove the book");
-                    }
+                    removeBookPage();
                     break;
                 case "3":
-                    boolean reRun = true;
-                    while (reRun) {
-                        System.out.println("1 - Update Book's Title");
-                        System.out.println("2 - Update Book's Author");
-                        System.out.println("3 - Update Book's Genre");
-                        System.out.println("4 - Update Book's Publication Date");
-                        System.out.println("5 - Go Back");
-
-                        String innerChoice = ConsoleUtil.inputString("Enter your choice");
-                        String isbnOfTheBookToUpdate = ConsoleUtil.inputString("Enter the isbn of book");
-                        switch (innerChoice) {
-                            case "1":
-                                String updatedTitle = ConsoleUtil.inputString("Enter the updated Title");
-                                if (library.updateBookTitle(isbnOfTheBookToUpdate, updatedTitle)) {
-                                    System.out.println("Title updated successfully");
-                                } else {
-                                    System.out.println("Failed to update Title");
-                                }
-                                break;
-                            case "2":
-                                String updatedAuthor = ConsoleUtil.inputString("Enter the updated Author Name");
-                                if (library.updateBookAuthor(isbnOfTheBookToUpdate, updatedAuthor)) {
-                                    System.out.println("Author Name updated successfully");
-                                } else {
-                                    System.out.println("Failed to update Author Name ");
-                                }
-                                break;
-                            case "3":
-                                String updatedGenre = ConsoleUtil.inputString("Enter the updated Genre");
-                                if (library.updateBookGenre(isbnOfTheBookToUpdate, updatedGenre)) {
-                                    System.out.println("Genre updated successfully");
-                                } else {
-                                    System.out.println("Failed to update Genre");
-                                }
-                                break;
-                            case "4":
-                                LocalDate updatedPublicationDate = ConsoleUtil.inputDate("Enter the updated Publication Date");
-                                if (library.updateBookPublicationDate(isbnOfTheBookToUpdate, updatedPublicationDate)) {
-                                    System.out.println("Genre updated successfully");
-                                } else {
-                                    System.out.println("Failed to update Genre");
-                                }
-                                break;
-                            case "5":
-                                reRun = false;
-                                break;
-                            default:
-                                System.err.println("Invalid Input! Try Again...");
-                        }
-                    }
+                    updateBookPage();
                     break;
                 case "4":
                     library.printAllBooks();
@@ -328,6 +269,110 @@ public class LibraryApp {
         }
     }
 
+    public static void addBookPage(){
+        library.addNewBook(ConsoleUtil.inputString("Enter the ISBN"),
+                ConsoleUtil.inputString("Enter the Title"),
+                ConsoleUtil.inputString("Enter Author name"),
+                ConsoleUtil.inputString("Enter Genre"),
+                ConsoleUtil.inputDate("Enter the Publication Date"),
+                ConsoleUtil.inputInteger("Enter the number of copies being added"));
+    }
+
+    public static void removeBookPage(){
+        String isbnOfTheBookToRemove = ConsoleUtil.inputString("Enter the ISBN of the book to remove");
+        library.removeABook(isbnOfTheBookToRemove);
+    }
+
+    public static void updateBookPage(){
+        boolean reRun = true;
+        while (reRun) {
+            System.out.println("1 - Update Book's Title");
+            System.out.println("2 - Update Book's Author");
+            System.out.println("3 - Update Book's Genre");
+            System.out.println("4 - Update Book's Publication Date");
+            System.out.println("5 - Update Book's Quantity");
+            System.out.println("6 - Go Back");
+
+            String innerChoice = ConsoleUtil.inputString("Enter your choice");
+            switch (innerChoice) {
+                case "1":
+                    updateBookTitlePage();
+                    break;
+                case "2":
+                    updateBookAuthorPage();
+                    break;
+                case "3":
+                    updateBookGenrePage();
+                    break;
+                case "4":
+                    updateBookPublicationDatePage();
+                    break;
+                case "5":
+                    updateBookQuantityPage();
+                    break;
+                case "6":
+                    reRun = false;
+                    break;
+                default:
+                    System.err.println("Invalid Input! Try Again...");
+            }
+        }
+    }
+
+    public static void updateBookTitlePage(){
+        String isbnOfTheBookToUpdate = ConsoleUtil.inputString("Enter the isbn of book");
+        String updatedTitle = ConsoleUtil.inputString("Enter the updated Title");
+        library.updateBookTitle(isbnOfTheBookToUpdate, updatedTitle);
+    }
+
+    public static void updateBookAuthorPage(){
+        String isbnOfTheBookToUpdate = ConsoleUtil.inputString("Enter the isbn of book");
+        String updatedAuthor = ConsoleUtil.inputString("Enter the updated Author Name");
+        library.updateBookAuthor(isbnOfTheBookToUpdate, updatedAuthor);
+    }
+
+    public static void updateBookGenrePage(){
+        String isbnOfTheBookToUpdate = ConsoleUtil.inputString("Enter the isbn of book");
+        String updatedGenre = ConsoleUtil.inputString("Enter the updated Genre");
+        library.updateBookGenre(isbnOfTheBookToUpdate, updatedGenre);
+    }
+
+    public static void updateBookPublicationDatePage(){
+        String isbnOfTheBookToUpdate = ConsoleUtil.inputString("Enter the isbn of book");
+        LocalDate updatedPublicationDate = ConsoleUtil.inputDate("Enter the updated Publication Date");
+        library.updateBookPublicationDate(isbnOfTheBookToUpdate, updatedPublicationDate);
+    }
+
+    public static void updateBookQuantityPage(){
+        boolean exit = false;
+        while (!exit){
+            System.out.println("1 - Increment Book Quantity");
+            System.out.println("2 - Decrement Book Quantity");
+            System.out.println("3 - Go Back");
+
+            String innerChoice = ConsoleUtil.inputString("Enter your choice");
+            String isbnOfTheBookToUpdate;
+            int variationValue;
+            switch (innerChoice){
+                case "1":
+                    isbnOfTheBookToUpdate = ConsoleUtil.inputString("Enter the isbn of book");
+                    variationValue = ConsoleUtil.inputInteger("Increment in Book's quantity");
+                    library.incrementBookQuantity(isbnOfTheBookToUpdate,variationValue);
+                    break;
+                case "2":
+                    isbnOfTheBookToUpdate = ConsoleUtil.inputString("Enter the isbn of book");
+                    variationValue = ConsoleUtil.inputInteger("Decrement in Book's quantity");
+                    library.decrementBookQuantity(isbnOfTheBookToUpdate,variationValue);
+                    break;
+                case "3":
+                    exit = true;
+                    break;
+                default:
+                    System.err.println("Invalid Input! Try Again...");
+            }
+        }
+    }
+
     public static void searchBooksOptions(){
         boolean exit = false;
         while (!exit) {
@@ -338,18 +383,22 @@ public class LibraryApp {
             System.out.println("5 - Go Back");
 
             String innerChoice = ConsoleUtil.inputString("Enter your choice");
-            String searchQuery = ConsoleUtil.inputString("Enter search query");
+            String searchQuery;
             switch (innerChoice) {
                 case "1":
-                    library.searchForBook(searchQuery);
+                    searchQuery = ConsoleUtil.inputString("Enter search query");
+                    library.searchForBookOverall(searchQuery);
                     break;
                 case "2":
+                    searchQuery = ConsoleUtil.inputString("Enter search query");
                     library.searchForBookByTitle(searchQuery);
                     break;
                 case "3":
+                    searchQuery = ConsoleUtil.inputString("Enter search query");
                     library.searchForBookByAuthor(searchQuery);
                     break;
                 case "4":
+                    searchQuery = ConsoleUtil.inputString("Enter search query");
                     library.searchForBookByGenre(searchQuery);
                     break;
                 case "5":
@@ -377,29 +426,17 @@ public class LibraryApp {
                 case "1":
                     String emailOfThePotentialBorrower = ConsoleUtil.inputString("Enter the email of borrower");
                     String isbnOfTheBookToBorrow = ConsoleUtil.inputString("Enter the isbn of book");
-                    if (library.addBorrowedBook(emailOfThePotentialBorrower,isbnOfTheBookToBorrow)){
-                        System.out.println("Record added successfully");
-                    }else {
-                        System.out.println("Failed to add the record");
-                    }
+                    library.addBorrowedBook(emailOfThePotentialBorrower,isbnOfTheBookToBorrow);
                     break;
                 case "2":
                     String emailOfTheBorrower = ConsoleUtil.inputString("Enter the email of borrower");
                     String isbnOfBorrowedBook = ConsoleUtil.inputString("Enter the isbn of book");
-                    if (library.addReturnedBook(emailOfTheBorrower,isbnOfBorrowedBook)){
-                        System.out.println("Record has been updated successfully");
-                    }else {
-                        System.out.println("Failed to update record");
-                    }
+                    library.addReturnedBook(emailOfTheBorrower,isbnOfBorrowedBook);
                     break;
                 case "3":
                     String emailOfPayer = ConsoleUtil.inputString("Enter the email of Paying borrower");
                     int paymentAmount = ConsoleUtil.inputInteger("Enter the amount paid");
-                    if (library.addPaidFine(emailOfPayer,paymentAmount)){
-                        System.out.println("Record updated successfully");
-                    }else {
-                        System.out.println("Failed to update record");
-                    }
+                    library.addPaidFine(emailOfPayer,paymentAmount);
                     break;
                 case "4":
                     exit = true;

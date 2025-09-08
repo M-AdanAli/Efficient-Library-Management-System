@@ -1,5 +1,6 @@
 package com.adanali.library.repository;
 
+import com.adanali.library.exceptions.EntityDuplicationException;
 import com.adanali.library.model.Librarian;
 import com.adanali.library.model.Student;
 import com.adanali.library.model.User;
@@ -27,12 +28,10 @@ public class UsersRepository implements RepositoryPattern<User,String>{
     }
 
     @Override
-    public boolean add(User user) {
+    public void add(User user) throws EntityDuplicationException {
         if (getById(user.getEmail()).isEmpty()){
             userSet.add(user);
-            return true;
-        }
-        return false;
+        }else throw new EntityDuplicationException(user.getClass(),"User with email "+user.getEmail()+" already exists!");
     }
 
     @Override

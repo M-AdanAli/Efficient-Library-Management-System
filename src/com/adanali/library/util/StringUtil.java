@@ -2,16 +2,18 @@ package com.adanali.library.util;
 
 public class StringUtil {
 
-    public static boolean isNotNullOrBlank(String str) {
-        return (str != null) && !(str.trim().isEmpty());
+    public static void validateNotNullOrBlank(String str, String attributeName) {
+        if (str == null || str.trim().isEmpty()){
+            throw new IllegalArgumentException(attributeName+" cannot be empty/blank!");
+        }
     }
 
     public static boolean isValidEmail(String email) {
-        if (isNotNullOrBlank(email)) {
-            String emailPattern = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
-            return email.matches(emailPattern);
-        }
-        return false;
+        validateNotNullOrBlank(email,"E-mail");
+        String emailPattern = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+        if (email.matches(emailPattern)) {
+            return true;
+        }else throw new IllegalArgumentException("Invalid E-mail format");
     }
 
     public static boolean isValidPassword(String password) {
@@ -25,37 +27,22 @@ public class StringUtil {
         .{8,20}: Matches any character (except newline) between 8 and 20 times, defining the minimum and maximum length of the password.
         $: Asserts the end of the string.
         */
-
-        if (isNotNullOrBlank(password)) {
-            String passwordPattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&+=])(?=\\S+$).{8,20}$";
-            return password.matches(passwordPattern);
-        }
-        return false;
+        validateNotNullOrBlank(password,"Password");
+        String passwordPattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&+=])(?=\\S+$).{8,20}$";
+        if (password.matches(passwordPattern)) {
+            return true;
+        } else throw new IllegalArgumentException("Password should be at least 8 characters long and at max 20.\n Must containing an uppercase character, a lower case character and a special character!");
     }
 
     public static boolean isValidIsbn(String isbn) {
-        if (isNotNullOrBlank(isbn)) {
-            // Step 1: Check regex pattern (hyphens + group lengths) OR plain pattern without hyphen
-            boolean hyphenedPatternValid = isbn.matches("^(?:978|979)-(\\d{1,5})-(\\d{1,7})-(\\d{1,6})-\\d$") && (isbn.length() == 17);
-            boolean plainPattern = isbn.matches("^(978|979)\\d{10}$");
-            // Step 2: Verify total length = 17 characters
-            // (3 prefix + 9 group digits + 1 check digit + 4 hyphens)
-            return (hyphenedPatternValid || plainPattern);
-        }
-        return false;
-    }
-
-    public static boolean isNumber(String value) {
-        if (isNotNullOrBlank(value)) {
-            return value.matches("\\d+");
-        }
-        return false;
-    }
-
-    public static boolean isValidBookSearchAttribute(String attribute){
-        if (isNotNullOrBlank(attribute)){
-            return (attribute.equalsIgnoreCase("title") || attribute.equalsIgnoreCase("author") || attribute.equalsIgnoreCase("genre") || attribute.equalsIgnoreCase("all"));
-        }
-        return false;
+        validateNotNullOrBlank(isbn,"ISBN");
+        // Step 1: Check regex pattern (hyphens + group lengths) OR plain pattern without hyphen
+        boolean hyphenedPatternValid = isbn.matches("^(?:978|979)-(\\d{1,5})-(\\d{1,7})-(\\d{1,6})-\\d$") && (isbn.length() == 17);
+        boolean plainPattern = isbn.matches("^(978|979)\\d{10}$");
+        // Step 2: Verify total length = 17 characters
+        // (3 prefix + 9 group digits + 1 check digit + 4 hyphens)
+        if ((hyphenedPatternValid || plainPattern)) {
+            return true;
+        }else throw new IllegalArgumentException("Invalid ISBN format");
     }
 }

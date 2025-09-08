@@ -33,14 +33,21 @@ public class ConsoleUtil {
             try {
                 return LocalDate.parse(dateString, formatter);
             } catch (java.time.format.DateTimeParseException e) {
-                System.err.println("Error: Invalid date format. Please use the specified format.");
+                System.err.println("Error: Invalid date format! Please use the specified format.");
             }
         }
     }
 
     public static int inputInteger(String prompt){
-        System.out.print(prompt+" : ");
-        return scan.nextInt();
+        while (true){
+            System.out.print(prompt+" : ");
+            String intString = scan.nextLine();
+            try {
+                return Integer.parseInt(intString);
+            } catch (NumberFormatException e) {
+                System.err.println("Error: Invalid input! Please enter a valid integer value.");
+            }
+        }
     }
 
     public static void delay(long duration){

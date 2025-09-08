@@ -1,13 +1,11 @@
 package com.adanali.library.model;
 
-import com.adanali.library.util.StringUtil;
-
 import java.time.LocalDate;
 import java.util.Objects;
 
 public class BorrowingRecord {
 
-    private String recordId;
+    private final String recordId;
     private final Book book;
     private final Borrower borrower;
     private final LocalDate borrowDate;
@@ -22,22 +20,12 @@ public class BorrowingRecord {
         this.borrower = borrower;
         this.borrowDate = borrowDate;
         this.dueDate = dueDate;
-        fine=0;
+        this.fine=0;
         updateStatus();
     }
 
     public String getRecordId() {
         return recordId;
-    }
-
-    public boolean setRecordId(String recordId) {
-        if (StringUtil.isNumber(recordId)){
-            this.recordId = recordId;
-            return true;
-        }else {
-            System.err.println("Invalid Record ID!");
-            return false;
-        }
     }
 
     public Book getBorrowedBook() {
@@ -60,16 +48,12 @@ public class BorrowingRecord {
         return returnDate;
     }
 
-    public boolean setReturnDate(LocalDate returnDate) {
+    public void setReturnDate(LocalDate returnDate) {
         if (returnDate != null && !returnDate.isBefore(getBorrowDate())){
             this.returnDate = returnDate;
             updateStatus();
             updateFine();
-            return true;
-        }else {
-            System.err.println("Pass a valid return date!");
-        }
-        return false;
+        }else throw new IllegalArgumentException("Pass a valid return date!");
     }
 
     public BorrowingStatus getStatus() {
@@ -97,15 +81,11 @@ public class BorrowingRecord {
         return fine;
     }
 
-    public boolean setFine(int fine) {
+    public void setFine(int fine) {
         if (fine >= 0){
             this.fine = fine;
             borrower.addPendingFine(fine);
-            return true;
-        }else{
-            System.err.println("Fine cannot be negative!");
-            return false;
-        }
+        }else throw new IllegalArgumentException("Fine cannot be negative!");
     }
 
     public void updateFine() {

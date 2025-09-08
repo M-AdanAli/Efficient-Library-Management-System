@@ -18,14 +18,9 @@ public class Student extends User implements Borrower{
         return address;
     }
 
-    public boolean setAddress(String address) {
-        if (StringUtil.isNotNullOrBlank(address)) {
-            this.address = address;
-            return true;
-        } else {
-            System.err.println("Address cannot be empty!");
-            return false;
-        }
+    public void setAddress(String address) {
+        StringUtil.validateNotNullOrBlank(address,"Address");
+        this.address = address;
     }
 
     @Override
@@ -34,18 +29,14 @@ public class Student extends User implements Borrower{
     }
 
     @Override
-    public boolean addPendingFine(int fine) {
+    public void addPendingFine(int fine) {
         if (fine > 0) {
             this.pendingFine += fine;
-            return true;
-        } else {
-            System.err.println("Fine cannot be negative!");
-            return false;
-        }
+        } else throw new IllegalArgumentException("Fine cannot be negative!");
     }
 
     @Override
-    public boolean reducePendingFine(int fine) {
+    public void reducePendingFine(int fine) {
         if (fine > 0) {
             if (fine <= this.pendingFine) {
                 this.pendingFine -= fine;
@@ -54,11 +45,7 @@ public class Student extends User implements Borrower{
                 System.out.println("Pending fine is less.");
                 System.out.printf("Following amount should be returned to the user : %d",fine-pendingFine);
             }
-            return true;
-        } else {
-            System.err.println("Fine cannot be negative!");
-        }
-        return false;
+        } else throw new IllegalArgumentException("Fine cannot be negative!");
     }
 
     @Override

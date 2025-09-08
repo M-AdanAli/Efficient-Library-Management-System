@@ -31,77 +31,57 @@ public class Book {
         return title;
     }
 
-    public boolean setTitle(String title) {
-        if (StringUtil.isNotNullOrBlank(title)) {
-            this.title = title;
-            return true;
-        }else{
-            System.err.println("Title cannot be empty.");
-            return false;
-        }
+    public void setTitle(String title) {
+        StringUtil.validateNotNullOrBlank(title,"Title");
+        this.title = title;
     }
 
     public String getAuthor() {
         return authorName;
     }
 
-    public boolean setAuthor(String author) {
-        if (StringUtil.isNotNullOrBlank(author)) {
-            this.authorName = author;
-            return true;
-        }else{
-            System.err.println("Author name cannot be empty.");
-            return false;
-        }
+    public void setAuthor(String author) {
+        StringUtil.validateNotNullOrBlank(author,"Author Name");
+        this.authorName = author;
     }
 
     public String getGenre() {
         return genre;
     }
 
-    public boolean setGenre(String genre) {
-        if (StringUtil.isNotNullOrBlank(genre)) {
-            this.genre = genre;
-            return true;
-        }else{
-            System.err.println("Genre cannot be empty.");
-            return false;
-        }
+    public void setGenre(String genre) {
+        StringUtil.validateNotNullOrBlank(genre,"Genre");
+        this.genre = genre;
     }
 
     public LocalDate getPublicationDate() {
         return publicationDate;
     }
 
-    public boolean setPublicationDate(LocalDate publicationDate) {
+    public void setPublicationDate(LocalDate publicationDate) {
         if (publicationDate != null) {
             this.publicationDate = publicationDate;
-            return true;
-        }else {
-            System.err.println("Publication date cannot be null.");
-            return false;
-        }
+        }else throw new IllegalArgumentException("Publication Date cannot be null");
     }
 
     public int getQuantity() {
         return quantity;
     }
 
-    private boolean setQuantity(int quantity) {
+    private void setQuantity(int quantity) {
         if (quantity > 0) {
             this.quantity = quantity;
-            return true;
-        }else{
-            System.err.println("Quantity cannot be zero/negative after change");
-            return false;
-        }
+        }else throw new IllegalArgumentException("Quantity cannot be zero/negative after change");
     }
 
-    public boolean changeQuantityByValue(int value){
+    public void changeQuantityByValue(int value){
         if (value != 0){
-            return this.setQuantity(this.getQuantity()+value);
-        }
-        return false;
+            this.setQuantity(this.getQuantity()+value);
+        }else throw new IllegalArgumentException("Invalid value to change book quantity!");
+    }
+
+    public boolean isAvailableForBorrow() {
+        return this.getQuantity()>0;
     }
 
     @Override

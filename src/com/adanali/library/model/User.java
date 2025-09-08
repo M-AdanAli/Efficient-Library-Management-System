@@ -12,7 +12,7 @@ public abstract class User {
     private String email;
     private String password;
 
-    protected User(String name, String email, String password) {
+    protected User(String name, String email, String password){
         setName(name);
         setEmail(email);
         setPassword(password);
@@ -21,27 +21,18 @@ public abstract class User {
     public String getName() {
         return name;
     }
-    public boolean setName(String name) {
-        if (StringUtil.isNotNullOrBlank(name)) {
-            this.name = name;
-            return true;
-        } else {
-            System.err.println("Name cannot be empty!");
-            return false;
-        }
+    public void setName(String name) {
+        StringUtil.validateNotNullOrBlank(name,"User Name");
+        this.name = name;
     }
 
     public String getEmail() {
         return email;
     }
 
-    public boolean setEmail(String email) {
+    public void setEmail(String email) {
         if (StringUtil.isValidEmail(email)) {
             this.email = email;
-            return true;
-        } else {
-            System.err.println("Pass a valid email.");
-            return false;
         }
     }
 
@@ -49,13 +40,9 @@ public abstract class User {
         return password;
     }
 
-    public boolean setPassword(String password) {
+    public void setPassword(String password) {
         if (StringUtil.isValidPassword(password)) {
             this.password = password;
-            return true;
-        } else {
-            System.err.println("Not a valid Password");
-            return false;
         }
     }
 
