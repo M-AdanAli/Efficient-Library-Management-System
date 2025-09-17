@@ -1,9 +1,25 @@
-# 1) Ignore everything by default
-*
+# Maven build directory
+/target/
 
-# 2) But don’t ignore these two entries:
-!/.gitignore
+# IntelliJ IDEA project files
+*.puml
+*.iml
+.idea/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Temporary/out files
+out/
+~$*
+
+# Keep source and resource files
 !/src/
 !/src/**
 
+# Keep documentation and diagrams
 !/Project Planning.rtf
+
+# Keep the pom.xml
+!/pom.xml

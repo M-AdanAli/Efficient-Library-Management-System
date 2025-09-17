@@ -134,8 +134,14 @@ public class LibraryApp {
                         String passwordToCheck = ConsoleUtil.inputString("Enter current password");
                         if (passwordToCheck.equals(currentUser.getPassword())){
                             String newPassword = ConsoleUtil.inputString("Enter new password");
-                            library.updateUserPassword(currentUser.getEmail(), newPassword);
+                            if (newPassword.equals(passwordToCheck)){
+                                System.out.println("Password is same!");
+                            }else {
+                                library.updateUserPassword(currentUser.getEmail(), newPassword);
+                            }
                             break;
+                        }else{
+                            System.out.println("Password does not match! try again...");
                         }
                     }
                     ConsoleUtil.delay(500);
