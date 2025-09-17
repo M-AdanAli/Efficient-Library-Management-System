@@ -1,4 +1,4 @@
-# Efficient Library Management System
+# Smart Library Management System
 
 [![Java Version](https://img.shields.io/badge/Java-11%2B-orange.svg)](https://www.oracle.com/java/technologies/javase-jdk11-downloads.html)
 [![Build Status](https://img.shields.io/badge/build-pending-yellow.svg)](https://github.com/M-AdanAli/Smart-Library-Management-System)
