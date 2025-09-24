@@ -8,4 +8,5 @@ public interface Borrower {
         return getPendingFine()==0;
     }
     byte getBorrowDurationInWeeks();
+    public String getName();
 }

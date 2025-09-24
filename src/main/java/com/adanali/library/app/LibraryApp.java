@@ -54,6 +54,7 @@ public class LibraryApp {
                 System.out.println("4 - Borrowing Service");
                 System.out.println("5 - Manage Borrowing Records");
                 System.out.println("6 - Logout");
+                System.out.println("7 - Exit");
 
                 String choice = ConsoleUtil.inputString("Enter your choice");
                 switch (choice){
@@ -76,6 +77,10 @@ public class LibraryApp {
                         currentUser = null;
                         exit = true;
                         break;
+                    case "7":
+                        currentUser = null;
+                        System.exit(0);
+                        break;
                     default:
                         System.out.println("Invalid choice!");
                         ConsoleUtil.delay(1000);
@@ -85,6 +90,7 @@ public class LibraryApp {
                 System.out.println("2 - Search Books");
                 System.out.println("3 - Manage My Borrowings");
                 System.out.println("4 - Logout");
+                System.out.println("5 - Exit");
 
                 String choice = ConsoleUtil.inputString("Enter your choice");
                 switch (choice){
@@ -100,6 +106,10 @@ public class LibraryApp {
                     case "4" :
                         exit = true;
                         currentUser = null;
+                        break;
+                    case "5":
+                        currentUser = null;
+                        System.exit(0);
                         break;
                     default:
                         System.out.println("Invalid choice!");
@@ -263,6 +273,7 @@ public class LibraryApp {
                     break;
                 case "4":
                     library.printAllBooks();
+                    ConsoleUtil.delay(2000);
                     break;
                 case "5":
                     searchBooksOptions();
@@ -282,11 +293,13 @@ public class LibraryApp {
                 ConsoleUtil.inputString("Enter Genre"),
                 ConsoleUtil.inputDate("Enter the Publication Date"),
                 ConsoleUtil.inputInteger("Enter the number of copies being added"));
+        ConsoleUtil.delay(500);
     }
 
     public static void removeBookPage(){
         String isbnOfTheBookToRemove = ConsoleUtil.inputString("Enter the ISBN of the book to remove");
         library.removeABook(isbnOfTheBookToRemove);
+        ConsoleUtil.delay(500);
     }
 
     public static void updateBookPage(){
@@ -329,24 +342,28 @@ public class LibraryApp {
         String isbnOfTheBookToUpdate = ConsoleUtil.inputString("Enter the isbn of book");
         String updatedTitle = ConsoleUtil.inputString("Enter the updated Title");
         library.updateBookTitle(isbnOfTheBookToUpdate, updatedTitle);
+        ConsoleUtil.delay(500);
     }
 
     public static void updateBookAuthorPage(){
         String isbnOfTheBookToUpdate = ConsoleUtil.inputString("Enter the isbn of book");
         String updatedAuthor = ConsoleUtil.inputString("Enter the updated Author Name");
         library.updateBookAuthor(isbnOfTheBookToUpdate, updatedAuthor);
+        ConsoleUtil.delay(500);
     }
 
     public static void updateBookGenrePage(){
         String isbnOfTheBookToUpdate = ConsoleUtil.inputString("Enter the isbn of book");
         String updatedGenre = ConsoleUtil.inputString("Enter the updated Genre");
         library.updateBookGenre(isbnOfTheBookToUpdate, updatedGenre);
+        ConsoleUtil.delay(500);
     }
 
     public static void updateBookPublicationDatePage(){
         String isbnOfTheBookToUpdate = ConsoleUtil.inputString("Enter the isbn of book");
         LocalDate updatedPublicationDate = ConsoleUtil.inputDate("Enter the updated Publication Date");
         library.updateBookPublicationDate(isbnOfTheBookToUpdate, updatedPublicationDate);
+        ConsoleUtil.delay(500);
     }
 
     public static void updateBookQuantityPage(){
@@ -364,11 +381,13 @@ public class LibraryApp {
                     isbnOfTheBookToUpdate = ConsoleUtil.inputString("Enter the isbn of book");
                     variationValue = ConsoleUtil.inputInteger("Increment in Book's quantity");
                     library.incrementBookQuantity(isbnOfTheBookToUpdate,variationValue);
+                    ConsoleUtil.delay(500);
                     break;
                 case "2":
                     isbnOfTheBookToUpdate = ConsoleUtil.inputString("Enter the isbn of book");
                     variationValue = ConsoleUtil.inputInteger("Decrement in Book's quantity");
                     library.decrementBookQuantity(isbnOfTheBookToUpdate,variationValue);
+                    ConsoleUtil.delay(500);
                     break;
                 case "3":
                     exit = true;
@@ -394,18 +413,22 @@ public class LibraryApp {
                 case "1":
                     searchQuery = ConsoleUtil.inputString("Enter search query");
                     library.searchForBookOverall(searchQuery);
+                    ConsoleUtil.delay(2000);
                     break;
                 case "2":
                     searchQuery = ConsoleUtil.inputString("Enter search query");
                     library.searchForBookByTitle(searchQuery);
+                    ConsoleUtil.delay(2000);
                     break;
                 case "3":
                     searchQuery = ConsoleUtil.inputString("Enter search query");
                     library.searchForBookByAuthor(searchQuery);
+                    ConsoleUtil.delay(2000);
                     break;
                 case "4":
                     searchQuery = ConsoleUtil.inputString("Enter search query");
                     library.searchForBookByGenre(searchQuery);
+                    ConsoleUtil.delay(2000);
                     break;
                 case "5":
                     exit = true;
@@ -433,16 +456,19 @@ public class LibraryApp {
                     String emailOfThePotentialBorrower = ConsoleUtil.inputString("Enter the email of borrower");
                     String isbnOfTheBookToBorrow = ConsoleUtil.inputString("Enter the isbn of book");
                     library.addBorrowedBook(emailOfThePotentialBorrower,isbnOfTheBookToBorrow);
+                    ConsoleUtil.delay(500);
                     break;
                 case "2":
                     String emailOfTheBorrower = ConsoleUtil.inputString("Enter the email of borrower");
                     String isbnOfBorrowedBook = ConsoleUtil.inputString("Enter the isbn of book");
                     library.addReturnedBook(emailOfTheBorrower,isbnOfBorrowedBook);
+                    ConsoleUtil.delay(500);
                     break;
                 case "3":
                     String emailOfPayer = ConsoleUtil.inputString("Enter the email of Paying borrower");
                     int paymentAmount = ConsoleUtil.inputInteger("Enter the amount paid");
                     library.addPaidFine(emailOfPayer,paymentAmount);
+                    ConsoleUtil.delay(500);
                     break;
                 case "4":
                     exit = true;
@@ -479,12 +505,15 @@ public class LibraryApp {
                         switch (innerChoice){
                             case "1":
                                 library.printActiveBorrowings();
+                                ConsoleUtil.delay(2000);
                                 break;
                             case"2":
                                 library.printReturnedBorrowings();
+                                ConsoleUtil.delay(2000);
                                 break;
                             case"3":
                                 library.printOverdueBorrowings();
+                                ConsoleUtil.delay(2000);
                                 break;
                             case"4":
                                 reRun = false;
@@ -497,13 +526,16 @@ public class LibraryApp {
                 case "2":
                     String email = ConsoleUtil.inputString("Enter User's Email");
                     library.printBorrowingsByUser(email);
+                    ConsoleUtil.delay(2000);
                     break;
                 case "3":
                     String isbn = ConsoleUtil.inputString("Enter ISBN of Book");
                     library.printBorrowingsByBook(isbn);
+                    ConsoleUtil.delay(2000);
                     break;
                 case "4":
                     library.printAllBorrowingRecords();
+                    ConsoleUtil.delay(2000);
                     break;
                 case "5":
                     exit = true;

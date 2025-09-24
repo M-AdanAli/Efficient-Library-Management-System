@@ -86,14 +86,17 @@ public class LibraryService {
     }
 
     public void printAllLibrarians(){
+        System.out.printf("%-15s | %-15s%n","NAME","E-MAIL");
         userService.listAllUsers().stream().filter(x->x.getRole().equalsIgnoreCase("Librarian")).forEach(System.out::println);
     }
 
     public void printAllStudents(){
+        System.out.printf("%-15s | %-15s | %-20s | %-12s%n","NAME","E-MAIL","ADDRESS","PENDING FINE");
         userService.listAllUsers().stream().filter(x->x.getRole().equalsIgnoreCase("Student")).forEach(System.out::println);
     }
 
     public void searchForUser(String query){
+        System.out.printf("%-15s | %-15s | %-20s | %-12s%n","NAME","E-MAIL","ADDRESS","PENDING FINE");
         userService.searchUsers(query).forEach(System.out::println);
     }
 
@@ -190,11 +193,13 @@ public class LibraryService {
     }
 
     public void printAllBooks(){
+        System.out.printf("%-16s | %-23s | %-15s | %-12s | %-16s | %-8s%n","ISBN","TITLE","AUTHOR","GENRE","PUBLICATION DATE","QUANTITY");
         bookService.listAllBooks().forEach(System.out::println);
     }
 
     public void searchForBookOverall(String query){
         try {
+            System.out.printf("%-16s | %-40s | %-25s | %-20s | %-16s | %-8s%n","ISBN","TITLE","AUTHOR","GENRE","PUBLICATION DATE","QUANTITY");
             bookService.searchBooks(query, BooksRepository.SearchAttribute.ALL).forEach(System.out::println);
         }catch (IllegalArgumentException e){
             System.out.println(e.getMessage());
@@ -202,14 +207,17 @@ public class LibraryService {
     }
 
     public void searchForBookByTitle(String query){
+        System.out.printf("%-16s | %-23s | %-15s | %-12s | %-16s | %-8s%n","ISBN","TITLE","AUTHOR","GENRE","PUBLICATION DATE","QUANTITY");
         bookService.searchBooks(query, BooksRepository.SearchAttribute.TITLE).forEach(System.out::println);
     }
 
     public void searchForBookByAuthor(String query){
+        System.out.printf("%-16s | %-23s | %-15s | %-12s | %-16s | %-8s%n","ISBN","TITLE","AUTHOR","GENRE","PUBLICATION DATE","QUANTITY");
         bookService.searchBooks(query, BooksRepository.SearchAttribute.AUTHOR).forEach(System.out::println);
     }
 
     public void searchForBookByGenre(String query){
+        System.out.printf("%-16s | %-23s | %-15s | %-12s | %-16s | %-8s%n","ISBN","TITLE","AUTHOR","GENRE","PUBLICATION DATE","QUANTITY");
         bookService.searchBooks(query, BooksRepository.SearchAttribute.GENRE).forEach(System.out::println);
     }
 
@@ -257,14 +265,20 @@ public class LibraryService {
     // See Borrowing Records
 
     public void printActiveBorrowings(){
+        System.out.printf("%-25s | %-15s | %-15s | %-11s | %-10s | %-11s | %-10s | %-8s%n",
+                "RECORD ID", "BOOK", "Borrower", "BORROW DATE", "DUE DATE", "RETURN DATE", "STATUS", "FINE" );
         borrowingService.getActiveBorrowings().forEach(System.out::println);
     }
 
     public void printReturnedBorrowings(){
+        System.out.printf("%-25s | %-15s | %-15s | %-11s | %-10s | %-11s | %-10s | %-8s%n",
+                "RECORD ID", "BOOK", "Borrower", "BORROW DATE", "DUE DATE", "RETURN DATE", "STATUS", "FINE" );
         borrowingService.getReturnedBorrowings().forEach(System.out::println);
     }
 
     public void printOverdueBorrowings(){
+        System.out.printf("%-25s | %-15s | %-15s | %-11s | %-10s | %-11s | %-10s | %-8s%n",
+                "RECORD ID", "BOOK", "Borrower", "BORROW DATE", "DUE DATE", "RETURN DATE", "STATUS", "FINE" );
         borrowingService.getOverdueBorrowings().forEach(System.out::println);
     }
 
@@ -272,6 +286,8 @@ public class LibraryService {
         try {
             User borrower = userService.getUserByEmail(email).orElseThrow(()->new EntityNotFoundException("There is no Borrower registered with the email : "+email));
             if (borrower instanceof Borrower){
+                System.out.printf("%-25s | %-15s | %-15s | %-11s | %-10s | %-11s | %-10s | %-8s%n",
+                        "RECORD ID", "BOOK", "Borrower", "BORROW DATE", "DUE DATE", "RETURN DATE", "STATUS", "FINE" );
                 borrowingService.getBorrowingsByBorrower((Borrower) borrower).forEach(System.out::println);
             }else throw new IllegalAccessException("The User don't even have borrowing rights!");
         } catch (EntityNotFoundException | IllegalAccessException | IllegalArgumentException e) {
@@ -282,6 +298,8 @@ public class LibraryService {
     public void printBorrowingsByBook(String isbn){
         try {
             Book book = bookService.getBookByIsbn(isbn).orElseThrow(()->new EntityNotFoundException("There is no book in library with ISBN : "+isbn));
+            System.out.printf("%-25s | %-15s | %-15s | %-11s | %-10s | %-11s | %-10s | %-8s%n",
+                    "RECORD ID", "BOOK", "Borrower", "BORROW DATE", "DUE DATE", "RETURN DATE", "STATUS", "FINE" );
             borrowingService.getBorrowingsByBook(book).forEach(System.out::println);
         }catch (EntityNotFoundException | IllegalArgumentException e){
             System.out.println(e.getMessage());
@@ -289,6 +307,8 @@ public class LibraryService {
     }
 
     public void printAllBorrowingRecords(){
+        System.out.printf("%-25s | %-15s | %-15s | %-11s | %-10s | %-11s | %-10s | %-8s%n",
+                "RECORD ID", "BOOK", "Borrower", "BORROW DATE", "DUE DATE", "RETURN DATE", "STATUS", "FINE" );
         borrowingService.getAllRecords().forEach(System.out::println);
     }
 

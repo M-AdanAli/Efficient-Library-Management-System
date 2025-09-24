@@ -60,7 +60,6 @@ public class Student extends User implements Borrower{
 
     @Override
     public String toString() {
-        return String.format("Student[E-mail=%s, Name=%s, Address=%s, PendingFine=%d]",
-                getEmail(), getName(), getAddress(), getPendingFine());
+        return String.format("%-15s | %-15s | %-20s | %-12s",getName(),getEmail(),getAddress(),getPendingFine());
     }
 }

@@ -98,7 +98,7 @@ public class Book {
 
     @Override
     public String toString() {
-        return String.format("Book[ISBN=%s, Title=%s, Author=%s, Genre=%s, Published=%s, Quantity=%d]",
+        return String.format("%-16s | %-40s | %-25s | %-20s | %-16s | %-8d",
                 getIsbn(), getTitle(), getAuthor(), getGenre(), getPublicationDate(), getQuantity());
     }
 }

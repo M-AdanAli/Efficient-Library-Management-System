@@ -28,7 +28,7 @@ public class StringUtil {
         $: Asserts the end of the string.
         */
         validateNotNullOrBlank(password,"Password");
-        String passwordPattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&+=])(?=\\S+$).{8,20}$";
+        String passwordPattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[*!@#$%^&+=])(?=\\S+$).{8,20}$";
         if (password.matches(passwordPattern)) {
             return true;
         } else throw new IllegalArgumentException("Password should be at least 8 characters long and at max 20.\n Must containing an uppercase character, a lower case character and a special character!");

@@ -65,6 +65,6 @@ public abstract class User {
 
     @Override
     public String toString() {
-        return String.format("User[E-mail=%s, Name=%s, Role=%s]", getEmail(), getName(), getRole());
+        return String.format("%-15s | %-15s",getName(),getEmail());
     }
 }

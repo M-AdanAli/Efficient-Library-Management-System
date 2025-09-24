@@ -99,7 +99,8 @@ public class BorrowingRecord {
 
     @Override
     public String toString() {
-        return String.format("BorrowingRecord[RecordId=%s, Book=%s, Borrower=%s, BorrowDate=%s, DueDate=%s, ReturnDate=%s, status=%s, fine=%s]", getRecordId(), getBorrowedBook(), getBorrower(), getBorrowDate(), getDueDate(), getReturnDate(), getStatus(), getFine() );
+        return String.format("%-25s | %-15s | %-15s | %-11s | %-10s | %-11s | %-10s | %-8s",
+                getRecordId(), getBorrowedBook().getTitle(), getBorrower().getName(), getBorrowDate(), getDueDate(), getReturnDate(), getStatus(), getFine() );
     }
 
     @Override
